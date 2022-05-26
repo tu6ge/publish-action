@@ -4,19 +4,24 @@ use crates_io_api::{SyncClient, Error};
 use cargo_toml::Manifest;
 use version_compare::{Cmp, compare_to};
 use std::process::Command;
+mod github;
 
 fn main() {
     //list_top_dependencies();
 
-    let published_version = get_published_version().unwrap();
-    let new_version = get_new_version().unwrap();
+    let res = github::client();
 
-    if compare_to(new_version, published_version, Cmp::Gt).unwrap() {
-        println!("新版本比较大");
-        let output = Command::new("git").arg("help").output().expect("git exec error!");
-        let output_str = String::from_utf8_lossy(&output.stdout);
-        println!("command res:{}", output_str)
-    }
+    println!("{:?}", res);
+
+    // let published_version = get_published_version().unwrap();
+    // let new_version = get_new_version().unwrap();
+
+    // if compare_to(new_version, published_version, Cmp::Gt).unwrap() {
+    //     println!("新版本比较大");
+    //     let output = Command::new("git").arg("help").output().expect("git exec error!");
+    //     let output_str = String::from_utf8_lossy(&output.stdout);
+    //     println!("command res:{}", output_str)
+    // }
 }
 
 
