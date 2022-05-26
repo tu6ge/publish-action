@@ -22,7 +22,9 @@ pub fn client() -> Result<(), Perror>{
     return Err(Perror::Github(response.text()?));
   }
 
-  println!("Got response: {}", response.text()?);
+  let result = json::parse(&response.text()?)?;
+
+  println!("Got response: {}", result[0]["object"]["sha"]);
   Ok(())
 }
 
@@ -34,6 +36,9 @@ pub enum Perror{
 
   #[error("var error")]
   VarError(#[from] std::env::VarError),
+
+  #[error("json error")]
+  JsonError(#[from] json::JsonError),
 
   #[error("input data is not valid")]
   Input(String),
