@@ -2,10 +2,12 @@
 use reqwest::blocking;
 use dotenv::dotenv;
 use std::{env};
-use thiserror::Error;
 
-pub fn client() -> Result<(), Perror>{
-  dotenv().ok();
+use crate::error::{Perror,Presult};
+
+
+pub fn client() -> Presult<String>{
+  dotenv()?;
 
   let client = blocking::Client::new();
   let token = env::var("GITHUB_TOKEN")?;
@@ -24,28 +26,7 @@ pub fn client() -> Result<(), Perror>{
 
   let result = json::parse(&response.text()?)?;
 
-  println!("Got response: {}", result[0]["object"]["sha"]);
-  Ok(())
-}
+  let sha: String = result[0]["object"]["sha"].to_string();
 
-
-#[derive(Error, Debug)]
-pub enum Perror{
-  #[error("reqwest error")]
-  Request(#[from] reqwest::Error),
-
-  #[error("var error")]
-  VarError(#[from] std::env::VarError),
-
-  #[error("json error")]
-  JsonError(#[from] json::JsonError),
-
-  #[error("input data is not valid")]
-  Input(String),
-
-  #[error("github api return error")]
-  Github(String),
-
-  #[error(transparent)]
-  Other(#[from] anyhow::Error),
+  Ok(sha)
 }
