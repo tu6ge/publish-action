@@ -1,4 +1,4 @@
-FROM ubuntu:last
+FROM ubuntu:latest
 
 LABEL com.github.actions.name="auto publish"
 LABEL com.github.actions.icon="package"
