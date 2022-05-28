@@ -22,8 +22,8 @@ fn main() {
     println!("repositroy: {}", repositroy);
     println!("branch: {}", branch);
 
-    let github = github::Github::new(&repositroy);
-    let sha = github.get_sha(&branch);
+    let gh = github::Github::new(&repositroy);
+    let sha = gh.get_sha(&branch);
     //let res = github.del_ref();
     println!("sha: {:?}", sha);
 
