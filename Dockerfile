@@ -1,4 +1,4 @@
-FROM rust:1-alpine3.14
+FROM ubuntu:last
 
 LABEL com.github.actions.name="auto publish"
 LABEL com.github.actions.icon="package"
@@ -12,8 +12,8 @@ LABEL maintainer="tu6ge <772364230@qq.com>"
 WORKDIR /publish-action
 COPY . .
 
-RUN apk update
-RUN apk add openssl-dev git libc-dev
+# RUN apk update
+# RUN apk add openssl-dev git libc-dev
 
 RUN cargo build
 
