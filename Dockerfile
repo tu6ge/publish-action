@@ -17,6 +17,6 @@ RUN apk add openssl-dev git libc-dev
 
 RUN cargo build
 
-RUN chmod +x ./target/debug/publish-action
+#RUN chmod +x ./target/debug/publish-action
 
-ENTRYPOINT ["cargo", "run"]
+ENTRYPOINT ["cargo", "run", "publish-action"]
