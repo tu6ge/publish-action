@@ -12,8 +12,10 @@ mod error;
 fn main() {
     //list_top_dependencies();
 
-    let res = github::client();
-
+    //let res = github::set_ref("dev-0.2.0", "e04af9c71e2a258490354ff96a098079575b3fac");
+    let github = github::Github::new("tu6ge", "oss");
+    let res = github.get_sha("master");
+    //let res = github.del_ref();
     println!("{:?}", res);
 
     // let published_version = get_published_version().unwrap();

@@ -1,32 +1,101 @@
+/**!
+ * # Github API SDK
+ */
 
-use reqwest::blocking;
+use reqwest::{blocking, Method};
 use dotenv::dotenv;
 use std::{env};
+use json::JsonValue;
+use std::collections::HashMap;
 
 use crate::error::{Perror,Presult};
 
+pub struct Github<'a>{
+  pub owner: &'a str,
+  pub repo: &'a str,
+}
 
-pub fn client() -> Presult<String>{
-  dotenv()?;
+impl <'a> Github<'a>{
 
-  let client = blocking::Client::new();
-  let token = env::var("GITHUB_TOKEN")?;
-  let mut auth = String::from("token ");
-  auth.push_str(&token);
-
-  let response = client.get("https://api.github.com/repos/tu6ge/oss/git/matching-refs/heads/master")
-    .header("Authorization", auth)
-    .header("User-Agent","tu6ge(772364230@qq.com)")
-    .header("Accept", "application/vnd.github.v3+json")
-    .send()?;
-  
-  if response.status() != 200 {
-    return Err(Perror::Github(response.text()?));
+  pub fn new(owner: &'a str, repo: &'a str) -> Github<'a> {
+    Github { 
+      owner,
+      repo,
+    }
   }
 
-  let result = json::parse(&response.text()?)?;
+  /// # Build reqwest client with gihub common configure
+  /// [github doc](https://docs.github.com/cn/rest/git/)
+  pub fn client(&self, method: Method, url: &str, body: Option<HashMap<&str, &str>>) -> Presult<JsonValue>
+  {
+    dotenv()?;
 
-  let sha: String = result[0]["object"]["sha"].to_string();
+    let client = blocking::Client::new();
+    let token = env::var("GITHUB_TOKEN")?;
+    let mut auth = String::from("token ");
+    auth.push_str(&token);
 
-  Ok(sha)
+    let mut full_url = String::from("https://api.github.com/repos/");
+    full_url.push_str(self.owner);
+    full_url.push('/');
+    full_url.push_str(self.repo);
+    full_url.push('/');
+    full_url.push_str(url);
+
+    let mut request = client.request(method, full_url)
+      .header("Authorization", auth)
+      .header("User-Agent","tu6ge(772364230@qq.com)")
+      .header("Accept", "application/vnd.github.v3+json");
+
+    if let Some(body) = body {
+      request = request.json(&body)
+    }
+
+    let response = request.send()?;
+    
+    if response.status() != 200 && response.status() !=201 && response.status() != 204{
+      return Err(Perror::Github(response.text()?));
+    }
+
+    if response.status() == 204 {
+      return Ok(JsonValue::new_object());
+    }
+
+    let result = json::parse(&response.text()?)?;
+    Ok(result)
+  }
+
+  /// # Get git sha of git head
+  pub fn get_sha(&self, head: &str) -> Presult<String>{
+    let url = String::from("git/matching-refs/heads/") + head;
+    let json = self.client(Method::GET, &url, None)?;
+    let sha: String = json[0]["object"]["sha"].to_string();
+    Ok(sha)
+  }
+  
+  /// # Set tag ref by git sha
+  pub fn set_ref(&self, tag: &str, sha: &str) -> Presult<()>{
+    let url = "git/refs";
+    let mut body = HashMap::new();
+  
+    let mut tag_string = String::from("refs/tags/");
+    tag_string.push_str(tag);
+    
+    body.insert("ref", tag_string.as_str());
+    body.insert("sha", sha);
+  
+    self.client(Method::POST, url, Some(body))?;
+    Ok(())
+  }
+  
+  /// # delete git ref
+  pub fn del_ref(&self) -> Presult<()>{
+    let url = "git/refs/tags/dev-0.2.0";
+  
+    self.client(Method::DELETE, url, None)?;
+    Ok(())
+  }
 }
+
+
+
