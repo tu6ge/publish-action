@@ -26,7 +26,7 @@ impl <'a> Github<'a>{
   /// [github doc](https://docs.github.com/cn/rest/git/)
   pub fn client(&self, method: Method, url: &str, body: Option<HashMap<&str, &str>>) -> Presult<JsonValue>
   {
-    // dotenv()?;
+    //dotenv()?;
 
     let client = blocking::Client::new();
     let token = env::var("GITHUB_TOKEN")?;
@@ -37,6 +37,8 @@ impl <'a> Github<'a>{
     full_url.push_str(self.repositroy);
     full_url.push('/');
     full_url.push_str(url);
+
+    println!("{}", full_url);
 
     let mut request = client.request(method, full_url)
       .header("Authorization", auth)
