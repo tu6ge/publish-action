@@ -26,7 +26,7 @@ impl <'a> Github<'a>{
   /// [github doc](https://docs.github.com/cn/rest/git/)
   pub fn client(&self, method: Method, url: &str, body: Option<HashMap<&str, &str>>) -> Presult<JsonValue>
   {
-    dotenv()?;
+    // dotenv()?;
 
     let client = blocking::Client::new();
     let token = env::var("GITHUB_TOKEN")?;

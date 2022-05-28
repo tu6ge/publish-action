@@ -14,7 +14,7 @@ mod error;
 fn main() {
     //list_top_dependencies();
     
-    dotenv().ok();
+    // dotenv().ok();
 
     let repositroy = env::var("GITHUB_REPOSITORY").unwrap();
     let branch = env::var("GITHUB_REF_NAME").unwrap();
