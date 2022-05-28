@@ -16,7 +16,7 @@ RUN apt update && apt install -y curl openssl libc6-dev git
 
 # RUN apk update
 # RUN apk add openssl-dev git libc-dev
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -y
 
 RUN cargo build
 
