@@ -17,6 +17,6 @@ RUN apk add openssl-dev git libc-dev
 
 RUN cargo build
 
-RUN chown +x ./target/debug/publish-action
+RUN chmod +x ./target/debug/publish-action
 
 ENTRYPOINT ["./target/debug/publish-action"]
