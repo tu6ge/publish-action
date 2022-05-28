@@ -14,6 +14,7 @@ COPY . .
 
 # RUN apk update
 # RUN apk add openssl-dev git libc-dev
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 RUN cargo build
 
