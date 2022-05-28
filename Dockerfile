@@ -19,4 +19,4 @@ RUN cargo build
 
 RUN chmod +x ./target/debug/publish-action
 
-ENTRYPOINT ["./target/debug/publish-action"]
+ENTRYPOINT ["cargo", "run"]
