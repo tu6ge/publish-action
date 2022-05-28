@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM rust:1-alpine3.14 as builder
 
 LABEL com.github.actions.name="auto publish"
 LABEL com.github.actions.icon="package"
@@ -12,14 +12,12 @@ LABEL maintainer="tu6ge <772364230@qq.com>"
 WORKDIR /publish-action
 COPY . .
 
-RUN apt update && apt install -y curl openssl libc6-dev git
+RUN apk update
+RUN apk add openssl-dev git libc-dev
 
-# RUN apk update
-# RUN apk add openssl-dev git libc-dev
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -y
+RUN cargo install --path .
 
-RUN cargo build
-
-#RUN chmod +x ./target/debug/publish-action
-
-ENTRYPOINT ["/publish-action/target/debug/publish-action"]
+FROM debian:buster-slim
+RUN apt-get update && apt-get install -y extra-runtime-dependencies && rm -rf /var/lib/apt/lists/*
+COPY --from=builder /usr/local/cargo/bin/publish-action /usr/local/bin/publish-action
+CMD ["publish-action"]
