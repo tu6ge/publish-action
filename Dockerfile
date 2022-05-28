@@ -12,6 +12,9 @@ LABEL maintainer="tu6ge <772364230@qq.com>"
 WORKDIR /publish-action
 COPY . .
 
+RUN apk update
+RUN apk add openssl-dev git libc-dev
+
 RUN cargo build
 
 RUN chown +x ./target/debug/publish-action
