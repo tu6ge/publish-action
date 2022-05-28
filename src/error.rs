@@ -18,10 +18,7 @@ pub enum Perror{
   Input(String),
 
   #[error("github api return error")]
-  Github(String),
-
-  #[error(transparent)]
-  Other(#[from] anyhow::Error),
+  Github(String)
 }
 
 pub type Presult<T> = Result<T,Perror>;

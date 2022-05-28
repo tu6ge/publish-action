@@ -11,16 +11,14 @@ use std::collections::HashMap;
 use crate::error::{Perror,Presult};
 
 pub struct Github<'a>{
-  pub owner: &'a str,
-  pub repo: &'a str,
+  pub repositroy: &'a str,
 }
 
 impl <'a> Github<'a>{
 
-  pub fn new(owner: &'a str, repo: &'a str) -> Github<'a> {
+  pub fn new(repositroy: &'a str) -> Github<'a> {
     Github { 
-      owner,
-      repo,
+      repositroy,
     }
   }
 
@@ -36,9 +34,7 @@ impl <'a> Github<'a>{
     auth.push_str(&token);
 
     let mut full_url = String::from("https://api.github.com/repos/");
-    full_url.push_str(self.owner);
-    full_url.push('/');
-    full_url.push_str(self.repo);
+    full_url.push_str(self.repositroy);
     full_url.push('/');
     full_url.push_str(url);
 

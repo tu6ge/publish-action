@@ -1,22 +1,31 @@
+
 use std::io::Read;
 
 use crates_io_api::{SyncClient, Error};
 use cargo_toml::Manifest;
 use version_compare::{Cmp, compare_to};
 use std::process::Command;
-
+use dotenv::dotenv;
+use std::{env};
 
 mod github;
 mod error;
 
 fn main() {
     //list_top_dependencies();
+    
+    dotenv().ok();
 
-    //let res = github::set_ref("dev-0.2.0", "e04af9c71e2a258490354ff96a098079575b3fac");
-    let github = github::Github::new("tu6ge", "oss");
-    let res = github.get_sha("master");
+    let repositroy = env::var("GITHUB_REPOSITORY").unwrap();
+    let branch = env::var("GITHUB_REF_NAME").unwrap();
+
+    println!("repositroy: {}", repositroy);
+    println!("branch: {}", branch);
+
+    let github = github::Github::new(&repositroy);
+    let sha = github.get_sha(&branch).unwrap();
     //let res = github.del_ref();
-    println!("{:?}", res);
+    println!("sha: {}", sha);
 
     // let published_version = get_published_version().unwrap();
     // let new_version = get_new_version().unwrap();
