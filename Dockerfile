@@ -12,7 +12,7 @@ LABEL maintainer="tu6ge <772364230@qq.com>"
 WORKDIR /publish-action
 COPY . .
 
-RUN apt update && apt install -y curl openssl-dev libc-dev git
+RUN apt update && apt install -y curl openssl libc6-dev git
 
 # RUN apk update
 # RUN apk add openssl-dev git libc-dev
