@@ -23,9 +23,9 @@ fn main() {
     println!("branch: {}", branch);
 
     let github = github::Github::new(&repositroy);
-    let sha = github.get_sha(&branch).unwrap();
+    let sha = github.get_sha(&branch);
     //let res = github.del_ref();
-    println!("sha: {}", sha);
+    println!("sha: {:?}", sha);
 
     // let published_version = get_published_version().unwrap();
     // let new_version = get_new_version().unwrap();
