@@ -12,4 +12,8 @@ LABEL maintainer="tu6ge <772364230@qq.com>"
 WORKDIR /publish-action
 COPY . .
 
-ENTRYPOINT ["cargo", "run"]
+RUN cargo build
+
+RUN chown +x ./target/debug/publish-action
+
+ENTRYPOINT ["./target/debug/publish-action"]
