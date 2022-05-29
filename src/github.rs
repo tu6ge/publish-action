@@ -38,7 +38,7 @@ impl <'a> Github<'a>{
 
     println!("append token");
 
-    let mut full_url = String::from("https://api.github.com/repos/");
+    let mut full_url = String::from("http://api.github.com/repos/");
     full_url.push_str(self.repositroy);
     full_url.push('/');
     full_url.push_str(url);
