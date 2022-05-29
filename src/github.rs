@@ -11,14 +11,16 @@ use std::collections::HashMap;
 use crate::error::{Perror,Presult};
 
 pub struct Github<'a>{
-  pub repositroy: &'a str,
+  repositroy: &'a str,
+  token: &'a str,
 }
 
 impl <'a> Github<'a>{
 
-  pub fn new(repositroy: &'a str) -> Github<'a> {
+  pub fn new(repositroy: &'a str, token: &'a str) -> Github<'a> {
     Github { 
       repositroy,
+      token,
     }
   }
 
@@ -29,9 +31,8 @@ impl <'a> Github<'a>{
     //dotenv()?;
 
     let client = blocking::Client::new();
-    let token = env::var("GITHUB_TOKEN").expect("get token failed");
     let mut auth = String::from("token ");
-    auth.push_str(&token);
+    auth.push_str(self.token);
 
     let mut full_url = String::from("https://api.github.com/repos/");
     full_url.push_str(self.repositroy);
