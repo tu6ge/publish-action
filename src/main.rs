@@ -1,6 +1,6 @@
+//extern crate openssl;
 
 use std::io::Read;
-
 use crates_io_api::{SyncClient, Error};
 use cargo_toml::Manifest;
 use version_compare::{Cmp, compare_to};
