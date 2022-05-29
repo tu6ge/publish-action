@@ -32,7 +32,9 @@ impl <'a> Github<'a>{
     println!("client begin");
 
     let client_inner = blocking::Client::new();
+    println!("blocking init");
     let mut auth = String::from("token ");
+    println!("token init");
     auth.push_str(self.token);
 
     println!("append token");
