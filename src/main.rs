@@ -7,30 +7,33 @@ use version_compare::{Cmp, compare_to};
 use std::process::Command;
 use dotenv::dotenv;
 use std::{env};
+use futures::executor::block_on;
 
 mod github;
 mod error;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     //list_top_dependencies();
     
-    //dotenv().ok();
+    dotenv().ok();
 
     let repositroy = env::var("GITHUB_REPOSITORY").unwrap();
     let branch = env::var("GITHUB_REF_NAME").unwrap();
     let token = env::var("GITHUB_TOKEN").unwrap();
 
     println!("repositroy: {}", repositroy);
-    let client_inner = reqwest::blocking::Client::builder().build();
-    println!("client_inner: {:?}", client_inner);
-    println!("token length: {}", token.len());
+    // let client_inner = reqwest::blocking::Client::builder().build();
+    // println!("client_inner: {:?}", client_inner);
+    // println!("token length: {}", token.len());
 
     
 
     let gh = github::Github::new(&repositroy, &token);
     let sha =  gh.get_sha(&branch);
+    let res = block_on(sha);
     //let res = github.del_ref();
-    println!("sha: {:?}", sha);
+    println!("sha: {:?}", res);
 
     // let published_version = get_published_version().unwrap();
     // let new_version = get_new_version().unwrap();
