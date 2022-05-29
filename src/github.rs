@@ -31,7 +31,7 @@ impl <'a> Github<'a>{
     //dotenv()?;
     println!("client begin");
 
-    let client_inner = blocking::Client::new();
+    let client_inner = blocking::Client::builder().build()?;
     println!("blocking init");
     let mut auth = String::from("token ");
     auth.push_str(self.token);
