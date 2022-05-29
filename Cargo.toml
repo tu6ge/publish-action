@@ -3,6 +3,7 @@ name = "publish-action"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
+description = "Auto Publish Cargo of Github Action"
 
 [[bin]]
 name = "publish-action"
