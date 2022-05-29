@@ -7,13 +7,12 @@ use version_compare::{Cmp, compare_to};
 use std::process::Command;
 use dotenv::dotenv;
 use std::{env};
-use futures::executor::block_on;
+use crate::error::{Perror,Presult};
 
 mod github;
 mod error;
 
-#[tokio::main]
-async fn main() {
+fn main() {
     //list_top_dependencies();
     
     dotenv().ok();
@@ -23,17 +22,17 @@ async fn main() {
     let token = env::var("GITHUB_TOKEN").unwrap();
 
     println!("repositroy: {}", repositroy);
-    // let client_inner = reqwest::blocking::Client::builder().build();
-    // println!("client_inner: {:?}", client_inner);
-    // println!("token length: {}", token.len());
-
-    
 
     let gh = github::Github::new(&repositroy, &token);
     let sha =  gh.get_sha(&branch);
-    let res = block_on(sha);
     //let res = github.del_ref();
-    println!("sha: {:?}", res);
+    println!("sha: {:?}", sha);
+
+    let (name,version) = get_new_info().unwrap();
+
+    let published_version = get_published_version(&version).unwrap();
+
+    println!("name: {}, published version: {}, version: {}", name, published_version, version)
 
     // let published_version = get_published_version().unwrap();
     // let new_version = get_new_version().unwrap();
@@ -47,27 +46,26 @@ async fn main() {
 }
 
 
-fn get_published_version() -> Result<String, Error> {
-    // Instantiate the client.
+fn get_published_version(name: &str) -> Presult<String> {
     let client = SyncClient::new(
          "tu6ge (772364230@qq.com)",
          std::time::Duration::from_millis(1000),
-    ).unwrap();
-    // Retrieve summary data.
-    let summary = client.get_crate("aliyun-oss-client")?;
+    )?;
+    let summary = client.get_crate(name)?;
     Ok(summary.crate_data.max_version)
 }
 
-fn get_new_version() -> Option<String> {
+fn get_new_info() -> Presult<(String,String)> {
     let mut content: Vec<u8> = Vec::new();
-    std::fs::File::open("../oss/Cargo.toml")
-      .expect("open file failed").read_to_end(&mut content)
-      .expect("read_to_end failed");
+    let mut path = env::var("GITHUB_PATH")?;
+    path.push_str("Cargo.toml");
 
-    let info = Manifest::from_slice(&content).expect("get version failed");
+    std::fs::File::open(path)?.read_to_end(&mut content)?;
+
+    let info = Manifest::from_slice(&content)?;
 
     match info.package {
-        Some(v) => Some(v.version),
-        None => None
+        Some(v) => Ok((v.name,v.version)),
+        None => Err(Perror::Input("not found version in Cargo.toml".to_string()))
     }
 }
