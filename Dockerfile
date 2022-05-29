@@ -13,7 +13,7 @@ WORKDIR /publish-action
 COPY . .
 
 RUN apk update
-RUN apk add git libc-dev
+RUN apk add openssl-dev git libc-dev
 
 RUN cargo install --path .
 
