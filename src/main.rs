@@ -29,10 +29,11 @@ fn main() {
     println!("sha: {:?}", sha);
 
     let (name,version) = get_new_info().unwrap();
+    println!("name: {}, version: {}", name, version);
 
     let published_version = get_published_version(&version).unwrap();
 
-    println!("name: {}, published version: {}, version: {}", name, published_version, version)
+    println!("name: {}, published version: {}, version: {}", name, published_version, version);
 
     // let published_version = get_published_version().unwrap();
     // let new_version = get_new_version().unwrap();
