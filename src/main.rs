@@ -7,6 +7,7 @@ use version_compare::{Cmp, compare_to};
 use std::process::Command;
 use dotenv::dotenv;
 use std::{env};
+use futures::executor::block_on;
 
 mod github;
 mod error;
@@ -28,9 +29,11 @@ fn main() {
     
 
     let gh = github::Github::new(&repositroy, &token);
-    let sha = gh.get_sha(&branch);
+    let get_sha =  gh.get_sha(&branch);
     //let res = github.del_ref();
+    let sha = block_on(get_sha);
     println!("sha: {:?}", sha);
+    
 
     // let published_version = get_published_version().unwrap();
     // let new_version = get_new_version().unwrap();

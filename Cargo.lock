@@ -594,6 +594,7 @@ dependencies = [
  "cargo_toml",
  "crates_io_api",
  "dotenv",
+ "futures",
  "json",
  "reqwest",
  "thiserror",
