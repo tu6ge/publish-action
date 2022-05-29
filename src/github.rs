@@ -26,15 +26,14 @@ impl <'a> Github<'a>{
 
   /// # Build reqwest client with gihub common configure
   /// [github doc](https://docs.github.com/cn/rest/git/)
-  pub async fn client(&self, method: Method, url: &str, body: Option<HashMap<&str, &str>>) -> Presult<JsonValue>
+  pub fn client(&self, method: Method, url: &str, body: Option<HashMap<&str, &str>>) -> Presult<JsonValue>
   {
     //dotenv()?;
     println!("client begin");
 
-    let client_inner = reqwest::Client::new();
+    let client_inner = blocking::Client::new();
     println!("blocking init");
     let mut auth = String::from("token ");
-    println!("token init");
     auth.push_str(self.token);
 
     println!("append token");
@@ -55,31 +54,31 @@ impl <'a> Github<'a>{
       request = request.json(&body)
     }
 
-    let response = request.send().await?;
+    let response = request.send()?;
     
     if response.status() != 200 && response.status() !=201 && response.status() != 204{
-      return Err(Perror::Github(response.text().await?));
+      return Err(Perror::Github(response.text()?));
     }
 
     if response.status() == 204 {
       return Ok(JsonValue::new_object());
     }
 
-    let result = json::parse(&response.text().await?)?;
+    let result = json::parse(&response.text()?)?;
     Ok(result)
   }
 
   /// # Get git sha of git head
-  pub async fn get_sha(&self, head: &str) -> Presult<String>{
+  pub fn get_sha(&self, head: &str) -> Presult<String>{
     println!("get_sha begin");
     let url = String::from("git/matching-refs/heads/") + head;
-    let json = self.client(Method::GET, &url, None).await?;
+    let json = self.client(Method::GET, &url, None)?;
     let sha: String = json[0]["object"]["sha"].to_string();
     Ok(sha)
   }
   
   /// # Set tag ref by git sha
-  pub async fn set_ref(&self, tag: &str, sha: &str) -> Presult<()>{
+  pub fn set_ref(&self, tag: &str, sha: &str) -> Presult<()>{
     let url = "git/refs";
     let mut body = HashMap::new();
   
@@ -89,15 +88,15 @@ impl <'a> Github<'a>{
     body.insert("ref", tag_string.as_str());
     body.insert("sha", sha);
   
-    self.client(Method::POST, url, Some(body)).await?;
+    self.client(Method::POST, url, Some(body))?;
     Ok(())
   }
   
   /// # delete git ref
-  pub async fn del_ref(&self) -> Presult<()>{
+  pub fn del_ref(&self) -> Presult<()>{
     let url = "git/refs/tags/dev-0.2.0";
   
-    self.client(Method::DELETE, url, None).await?;
+    self.client(Method::DELETE, url, None)?;
     Ok(())
   }
 }
