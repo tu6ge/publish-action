@@ -57,7 +57,7 @@ fn get_published_version(name: &str) -> Presult<String> {
 
 fn get_new_info() -> Presult<(String,String)> {
     let mut content: Vec<u8> = Vec::new();
-    let mut path = env::var("GITHUB_PATH")?;
+    let mut path = env::var("GITHUB_WORKSPACE")?;
     path.push_str("/Cargo.toml");
 
     println!("path {}", path);
