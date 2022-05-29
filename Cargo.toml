@@ -14,5 +14,6 @@ crates_io_api = "0.8.0"
 dotenv = "0.15.0"
 thiserror = "1.0"
 json = "0.12.4"
-reqwest = {version ="0.11.10", features= ["blocking"]}
+#openssl = "0.10.40"
+reqwest = {version ="0.11.10", features= ["blocking","rustls-tls"]}
 version-compare = "0.1.0"
