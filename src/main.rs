@@ -1,4 +1,4 @@
-//extern crate openssl;
+extern crate openssl;
 
 use std::io::Read;
 use crates_io_api::{SyncClient, Error};
