@@ -35,6 +35,8 @@ impl <'a> Github<'a>{
     let mut auth = String::from("token ");
     auth.push_str(self.token);
 
+    println!("append token");
+
     let mut full_url = String::from("https://api.github.com/repos/");
     full_url.push_str(self.repositroy);
     full_url.push('/');
