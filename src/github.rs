@@ -1,7 +1,7 @@
 /**!
  * # Github API SDK
  */
-extern crate openssl;
+//extern crate openssl;
 
 use reqwest::{blocking, Method};
 use dotenv::dotenv;

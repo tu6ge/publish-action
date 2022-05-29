@@ -15,7 +15,7 @@ dotenv = "0.15.0"
 futures = "0.3.21"
 thiserror = "1.0"
 json = "0.12.4"
-openssl = "0.10.40"
-reqwest = {version ="0.11.10", default-features = false,features= ["json"]}
+#openssl = "0.10.40"
+reqwest = {version ="0.11.10", native-tls = false,features= ["json","rustls-tls"]}
 tokio = { version = "1", features = ["full"] }
 version-compare = "0.1.0"
