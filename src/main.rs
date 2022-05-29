@@ -19,8 +19,8 @@ fn main() {
     let repositroy = env::var("GITHUB_REPOSITORY").unwrap();
     let branch = env::var("GITHUB_REF_NAME").unwrap();
 
-    println!("repositroy: {}", repositroy);
-    println!("branch: {}", branch);
+    // println!("repositroy: {}", repositroy);
+    // println!("branch: {}", branch);
 
     let gh = github::Github::new(&repositroy);
     let sha = gh.get_sha(&branch);
