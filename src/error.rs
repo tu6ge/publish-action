@@ -18,7 +18,19 @@ pub enum Perror{
   Input(String),
 
   #[error("github api return error")]
-  Github(String)
+  Github(String),
+
+  #[error("io error {0}")]
+  Io(#[from] std::io::Error),
+
+  #[error("CargoToml error {0}")]
+  CargoToml(#[from] cargo_toml::Error),
+
+  #[error("InvalidHeaderValue {0}")]
+  InvalidHeaderValue(#[from] reqwest::header::InvalidHeaderValue),
+
+  #[error("crates io api error {0}")]
+  CratesIoApi(#[from] crates_io_api::Error)
 }
 
 pub type Presult<T> = Result<T,Perror>;
