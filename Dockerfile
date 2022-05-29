@@ -18,6 +18,6 @@ RUN apk add openssl-dev git libc-dev
 RUN cargo install --path .
 
 FROM debian:buster-slim
-RUN apt-get update && apt-get install -y extra-runtime-dependencies && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 COPY --from=builder /usr/local/cargo/bin/publish-action /usr/local/bin/publish-action
 CMD ["publish-action"]
