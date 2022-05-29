@@ -31,19 +31,18 @@ fn main() {
     let (name,version) = get_new_info().unwrap();
     println!("name: {}, version: {}", name, version);
 
-    let published_version = get_published_version(&version).unwrap();
+    let published_version = get_published_version(&name).unwrap();
 
     println!("name: {}, published version: {}, version: {}", name, published_version, version);
 
     // let published_version = get_published_version().unwrap();
     // let new_version = get_new_version().unwrap();
 
-    // if compare_to(new_version, published_version, Cmp::Gt).unwrap() {
-    //     println!("新版本比较大");
-    //     let output = Command::new("git").arg("help").output().expect("git exec error!");
-    //     let output_str = String::from_utf8_lossy(&output.stdout);
-    //     println!("command res:{}", output_str)
-    // }
+    if compare_to(version, published_version, Cmp::Gt).unwrap() {
+        println!("新版本比较大");
+    }else {
+        println!("新版本不大");
+    }
 }
 
 
