@@ -29,7 +29,7 @@ impl <'a> Github<'a>{
     //dotenv()?;
 
     let client = blocking::Client::new();
-    let token = env::var("GITHUB_TOKEN")?;
+    let token = env::var("GITHUB_TOKEN").expect("get token failed");
     let mut auth = String::from("token ");
     auth.push_str(&token);
 
