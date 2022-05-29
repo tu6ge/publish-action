@@ -21,7 +21,7 @@ fn main() {
     let token = env::var("GITHUB_TOKEN").unwrap();
 
     println!("repositroy: {}", repositroy);
-    let client_inner = reqwest::Client::new();
+    let client_inner = reqwest::blocking::Client::builder().build();
     println!("client_inner: {:?}", client_inner);
     println!("token length: {}", token.len());
 
