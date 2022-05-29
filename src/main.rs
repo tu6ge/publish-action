@@ -58,7 +58,9 @@ fn get_published_version(name: &str) -> Presult<String> {
 fn get_new_info() -> Presult<(String,String)> {
     let mut content: Vec<u8> = Vec::new();
     let mut path = env::var("GITHUB_PATH")?;
-    path.push_str("Cargo.toml");
+    path.push_str("/Cargo.toml");
+
+    println!("path {}", path);
 
     std::fs::File::open(path)?.read_to_end(&mut content)?;
 
