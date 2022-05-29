@@ -31,9 +31,9 @@ impl <'a> Github<'a>{
     //dotenv()?;
     println!("client begin");
 
-    let client = blocking::Client::new();
+    let client_inner = blocking::Client::new();
     let mut auth = String::from("token ");
-    //auth.push_str(self.token);
+    auth.push_str(self.token);
 
     println!("append token");
 
@@ -44,7 +44,7 @@ impl <'a> Github<'a>{
 
     println!("full_url :{}", full_url);
 
-    let mut request = client.request(method, full_url)
+    let mut request = client_inner.request(method, full_url)
       .header("Authorization", auth)
       .header("User-Agent","tu6ge(772364230@qq.com)")
       .header("Accept", "application/vnd.github.v3+json");
