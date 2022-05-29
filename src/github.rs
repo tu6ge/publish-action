@@ -33,7 +33,7 @@ impl <'a> Github<'a>{
 
     let client = blocking::Client::new();
     let mut auth = String::from("token ");
-    auth.push_str(self.token);
+    //auth.push_str(self.token);
 
     println!("append token");
 
