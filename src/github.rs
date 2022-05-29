@@ -29,6 +29,7 @@ impl <'a> Github<'a>{
   pub fn client(&self, method: Method, url: &str, body: Option<HashMap<&str, &str>>) -> Presult<JsonValue>
   {
     //dotenv()?;
+    println!("client begin");
 
     let client = blocking::Client::new();
     let mut auth = String::from("token ");
@@ -39,7 +40,7 @@ impl <'a> Github<'a>{
     full_url.push('/');
     full_url.push_str(url);
 
-    println!("{}", full_url);
+    println!("full_url :{}", full_url);
 
     let mut request = client.request(method, full_url)
       .header("Authorization", auth)
@@ -66,6 +67,7 @@ impl <'a> Github<'a>{
 
   /// # Get git sha of git head
   pub fn get_sha(&self, head: &str) -> Presult<String>{
+    println!("get_sha begin");
     let url = String::from("git/matching-refs/heads/") + head;
     let json = self.client(Method::GET, &url, None)?;
     let sha: String = json[0]["object"]["sha"].to_string();
