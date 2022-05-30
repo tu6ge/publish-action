@@ -20,10 +20,11 @@ fn main() -> Presult<()> {
     let repositroy = env::var("GITHUB_REPOSITORY")?;
     let branch = env::var("GITHUB_REF_NAME")?;
     let token = env::var("GITHUB_TOKEN")?;
+    let path = env::var("GITHUB_WORKSPACE")?;
 
     println!("repositroy: {}", repositroy);
 
-    let (name,version) = get_new_info()?;
+    let (name,version) = get_new_info(&path)?;
     println!("name: {}, version: {}", name, version);
 
     let published_version = get_published_version(&name)?;
@@ -34,7 +35,17 @@ fn main() -> Presult<()> {
         return Ok(());
     }
 
+    
     println!("find new version");
+    
+
+    let com_res = Command::new("cargo").arg("publish")
+        .current_dir(&path)
+        .status()?;
+    if com_res.success()==false {
+        return Err(Perror::Input("publish command failed".to_string()));
+    }
+    
     let gh = github::Github::new(&repositroy, &token);
     let sha =  gh.get_sha(&branch)?;
     println!("sha: {}", sha);
@@ -55,9 +66,9 @@ fn get_published_version(name: &str) -> Presult<String> {
     Ok(summary.crate_data.max_version)
 }
 
-fn get_new_info() -> Presult<(String,String)> {
+fn get_new_info(path: &str) -> Presult<(String,String)> {
     let mut content: Vec<u8> = Vec::new();
-    let mut path = env::var("GITHUB_WORKSPACE")?;
+    let mut path = String::from(path);
     path.push_str("/Cargo.toml");
 
     //println!("path {}", path);
