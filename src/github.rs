@@ -3,8 +3,6 @@
  */
 
 use reqwest::{blocking, Method};
-use dotenv::dotenv;
-use std::{env};
 use json::JsonValue;
 use std::collections::HashMap;
 
@@ -85,6 +83,7 @@ impl <'a> Github<'a>{
     Ok(())
   }
   
+  #[allow(dead_code)]
   /// # delete git ref
   pub fn del_ref(&self) -> Presult<()>{
     let url = "git/refs/tags/dev-0.2.0";
