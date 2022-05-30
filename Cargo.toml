@@ -1,9 +1,9 @@
 [package]
 name = "publish-action"
-version = "0.1.9"
+version = "0.1.10"
 edition = "2021"
 license = "MIT"
-description = "Auto Publish Cargo of Github Action"
+description = "Auto Publish Cargo with Github Action"
 
 [[bin]]
 name = "publish-action"
