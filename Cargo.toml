@@ -1,9 +1,10 @@
 [package]
 name = "publish-action"
-version = "0.1.10"
+version = "0.1.11"
 edition = "2021"
 license = "MIT"
 description = "Auto Publish Cargo with Github Action"
+keywords = ["github-action", "cargo","CI-CD", "publish"]
 
 [[bin]]
 name = "publish-action"
@@ -19,5 +20,4 @@ thiserror = "1.0"
 json = "0.12.4"
 #openssl = "0.10.40"
 reqwest = {version ="0.11.10",features= ["blocking","json"]}
-tokio = { version = "1", features = ["full"] }
 version-compare = "0.1.0"
