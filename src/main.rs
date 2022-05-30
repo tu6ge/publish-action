@@ -1,7 +1,7 @@
 //extern crate openssl;
 
 use std::io::Read;
-use crates_io_api::{SyncClient, Error};
+use crates_io_api::{SyncClient};
 use cargo_toml::Manifest;
 use version_compare::{Cmp, compare_to};
 use std::process::Command;
@@ -12,37 +12,37 @@ use crate::error::{Perror,Presult};
 mod github;
 mod error;
 
-fn main() {
+fn main() -> Presult<()> {
     //list_top_dependencies();
     
     dotenv().ok();
 
-    let repositroy = env::var("GITHUB_REPOSITORY").unwrap();
-    let branch = env::var("GITHUB_REF_NAME").unwrap();
-    let token = env::var("GITHUB_TOKEN").unwrap();
+    let repositroy = env::var("GITHUB_REPOSITORY")?;
+    let branch = env::var("GITHUB_REF_NAME")?;
+    let token = env::var("GITHUB_TOKEN")?;
 
     println!("repositroy: {}", repositroy);
 
-    let gh = github::Github::new(&repositroy, &token);
-    let sha =  gh.get_sha(&branch);
-    //let res = github.del_ref();
-    println!("sha: {:?}", sha);
-
-    let (name,version) = get_new_info().unwrap();
+    let (name,version) = get_new_info()?;
     println!("name: {}, version: {}", name, version);
 
-    let published_version = get_published_version(&name).unwrap();
+    let published_version = get_published_version(&name)?;
+    println!("published version: {}", published_version);
 
-    println!("name: {}, published version: {}, version: {}", name, published_version, version);
-
-    // let published_version = get_published_version().unwrap();
-    // let new_version = get_new_version().unwrap();
-
-    if compare_to(version, published_version, Cmp::Gt).unwrap() {
-        println!("新版本比较大");
-    }else {
-        println!("新版本不大");
+    if compare_to(&version, &published_version, Cmp::Gt).unwrap() == false {
+        println!("not find new version");
+        return Ok(());
     }
+
+    println!("find new version");
+    let gh = github::Github::new(&repositroy, &token);
+    let sha =  gh.get_sha(&branch)?;
+    println!("sha: {}", sha);
+
+    gh.set_ref(&version, &sha)?;
+    println!("new version {} is created", &version);
+
+    Ok(())
 }
 
 
@@ -60,7 +60,7 @@ fn get_new_info() -> Presult<(String,String)> {
     let mut path = env::var("GITHUB_WORKSPACE")?;
     path.push_str("/Cargo.toml");
 
-    println!("path {}", path);
+    //println!("path {}", path);
 
     std::fs::File::open(path)?.read_to_end(&mut content)?;
 
