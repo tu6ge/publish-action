@@ -1,6 +1,6 @@
 [package]
 name = "publish-action"
-version = "0.1.7"
+version = "0.1.8"
 edition = "2021"
 license = "MIT"
 description = "Auto Publish Cargo of Github Action"
@@ -18,6 +18,6 @@ futures = "0.3.21"
 thiserror = "1.0"
 json = "0.12.4"
 #openssl = "0.10.40"
-reqwest = {version ="0.11.10", native-tls = false, default-tls=false,features= ["json","rustls-tls"]}
+reqwest = {version ="0.11.10",features= ["blocking","json"]}
 tokio = { version = "1", features = ["full"] }
 version-compare = "0.1.0"
