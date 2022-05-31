@@ -19,5 +19,5 @@ futures = "0.3.21"
 thiserror = "1.0"
 json = "0.12.4"
 #openssl = "0.10.40"
-reqwest = {version ="0.11.10",features= ["blocking","json"]}
+reqwest = {version ="0.11.10",features= ["blocking"]}
 version-compare = "0.1.0"
