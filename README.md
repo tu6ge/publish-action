@@ -60,7 +60,7 @@ jobs:
       - name: Install publish-action
         if: steps.cache-publish-action.outputs.cache-hit != 'true'
         run:
-          cargo install publish-action@0.1.11
+          cargo install publish-action@0.1.12
       
       - name: Run publish-action
         run:
