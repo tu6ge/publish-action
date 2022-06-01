@@ -46,10 +46,21 @@ jobs:
     steps:
       - uses: actions/checkout@master
 
+      # Use caching to speed up your build
+      - name: Cache publish-action bin
+        id: cache-publish-action
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-publish-action
+        with:
+          path: ~/.cargo
+          key: ${{ runner.os }}-build-${{ env.cache-name }}
+
       # install publish-action by cargo in github action
-      - name: Install
+      - name: Install publish-action
+        if: steps.cache-publish-action.outputs.cache-hit != 'true'
         run:
-          cargo install publish-action
+          cargo install publish-action@0.1.11
       
       - name: Run publish-action
         run:
