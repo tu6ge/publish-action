@@ -1,0 +1,39 @@
+name: Publish to Cargo
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    name: 'publish'
+
+    environment: cargo
+
+    steps:
+      - uses: actions/checkout@master
+
+      # v0.1.11 目前版本
+      - name: Cache publish-action bin
+        id: cache-publish-action
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-publish-action
+        with:
+          path: ~/.cargo
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-v0.1.12
+
+      - name: Install publish-action
+        if: steps.cache-publish-action.outputs.cache-hit != 'true'
+        run:
+          cargo install publish-action --version=0.1.12
+      
+      - name: Run publish-action
+        run: 
+          publish-action
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
