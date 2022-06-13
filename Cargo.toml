@@ -1,10 +1,12 @@
 [package]
 name = "publish-action"
-version = "0.1.11"
+version = "0.1.14"
 edition = "2021"
 license = "MIT"
 description = "Auto Publish Cargo with Github Action"
 keywords = ["github-action", "cargo","CI-CD", "publish"]
+repository = "https://github.com/tu6ge/publish-action"
+authors = ["tu6ge <772364230@qq.com>"]
 
 [[bin]]
 name = "publish-action"
