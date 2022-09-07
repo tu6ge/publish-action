@@ -32,10 +32,11 @@ fn main() -> Presult<()> {
 
     if compare_to(&version, &published_version, Cmp::Gt).unwrap() == false {
         println!("not find new version");
+        println!("::set-output name=new_version::false");
         return Ok(());
     }
 
-    
+    println!("::set-output name=new_version::true");
     println!("find new version");
     
 
@@ -43,6 +44,7 @@ fn main() -> Presult<()> {
         .current_dir(&path)
         .status()?;
     if com_res.success()==false {
+        println!("::set-output name=publish::false");
         return Err(Perror::Input("publish command failed".to_string()));
     }
     
@@ -52,6 +54,7 @@ fn main() -> Presult<()> {
 
     gh.set_ref(&version, &sha)?;
     println!("new version {} is created", &version);
+    println!("::set-output name=publish::true");
 
     Ok(())
 }
