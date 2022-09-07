@@ -60,13 +60,13 @@ jobs:
           cache-name: cache-publish-action
         with:
           path: ~/.cargo
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-v0.1.13
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-v0.1.15
 
       # install publish-action by cargo in github action
       - name: Install publish-action
         if: steps.cache-publish-action.outputs.cache-hit != 'true'
         run:
-          cargo install publish-action --version=0.1.13
+          cargo install publish-action --version=0.1.15
       
       - name: Run publish-action
         id: publish-action
@@ -78,10 +78,10 @@ jobs:
           # This can help you publish to crates.io
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
-      - name: Update Changelog.md
-        if: steps.publish-action.outputs.new_version == 'true' && steps.publish-action.outputs.publish == 'true'
-        run: |
-          changelog -o Changelog.md
+      #- name: Update Changelog.md
+      #  if: steps.publish-action.outputs.new_version == 'true' && steps.publish-action.outputs.publish == 'true'
+      #  run: |
+      #    changelog -o Changelog.md
 ```
 
 5. You can push to github with new github action. this is finished.
