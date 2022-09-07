@@ -15,6 +15,12 @@ Now, you only need update version in Cargo.toml, after you push to github, the g
 and publish to crates.io with new version.
 
 Before you publish, you can also run test case.
+## Outputs (0.1.15 +)
+
+After run the action, you can judge the state (find new version or not, publish success or failure) with outputs.
+
+- `new_version`: return 'true' or 'false'
+- `publish`: return 'true' or 'false'
 
 ## Usage
 
@@ -63,6 +69,7 @@ jobs:
           cargo install publish-action --version=0.1.13
       
       - name: Run publish-action
+        id: publish-action
         run:
           publish-action
         env:
@@ -70,6 +77,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # This can help you publish to crates.io
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
+      - name: Update Changelog.md
+        if: steps.publish-action.outputs.new_version == 'true' && steps.publish-action.outputs.publish == 'true'
+        run: |
+          changelog -o Changelog.md
 ```
 
 5. You can push to github with new github action. this is finished.
