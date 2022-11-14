@@ -1,8 +1,7 @@
 //extern crate openssl;
 
-use std::env;
-use std::io::Read;
 use std::process::Command;
+use std::{env, path::PathBuf};
 
 use crate::error::{Perror, Presult};
 use cargo_toml::Manifest;
@@ -69,18 +68,12 @@ fn get_published_version(name: &str) -> Presult<String> {
     Ok(summary.crate_data.max_version)
 }
 
-fn get_new_info(path: &str) -> Presult<(String, String)> {
-    let mut content: Vec<u8> = Vec::new();
-    let mut path = String::from(path);
-    path.push_str("/Cargo.toml");
+fn get_new_info(dir: &str) -> Presult<(String, String)> {
+    let mut cargo_toml = PathBuf::from(dir);
+    cargo_toml.push("Cargo.toml");
+    let manifest = Manifest::from_path(&cargo_toml)?;
 
-    //println!("path {}", path);
-
-    std::fs::File::open(path)?.read_to_end(&mut content)?;
-
-    let info = Manifest::from_slice(&content)?;
-
-    match info.package {
+    match manifest.package {
         Some(v) => Ok((v.name, v.version)),
         None => Err(Perror::Input("not found version in Cargo.toml".to_string())),
     }
