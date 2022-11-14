@@ -1,16 +1,22 @@
 //extern crate openssl;
 
-use std::process::Command;
 use std::{env, path::PathBuf};
+use std::{process::Command, task::Poll};
 
 use crate::error::{Perror, Presult};
-use cargo_toml::Manifest;
-use crates_io_api::SyncClient;
+use cargo::core::{Dependency, QueryKind, Registry, SourceId, Workspace};
 use dotenv::dotenv;
-use version_compare::{compare_to, Cmp};
 
 mod error;
 mod github;
+
+pub const CRATES_IO_REGISTRY: &str = "crates-io";
+
+#[derive(Debug)]
+enum PublicationStatus {
+    NotPublished,
+    Published,
+}
 
 fn main() -> Presult<()> {
     //list_top_dependencies();
@@ -22,22 +28,21 @@ fn main() -> Presult<()> {
     let token = env::var("GITHUB_TOKEN")?;
     let path = env::var("GITHUB_WORKSPACE")?;
 
+    let (name, version, publication_status) = get_publication_status(&path)?;
     println!("repository: {}", repository);
-
-    let (name, version) = get_new_info(&path)?;
     println!("name: {}, version: {}", name, version);
+    println!("publication status: {:?}", publication_status);
 
-    let published_version = get_published_version(&name)?;
-    println!("published version: {}", published_version);
-
-    if !compare_to(&version, &published_version, Cmp::Gt).unwrap() {
-        println!("not find new version");
-        println!("::set-output name=new_version::false");
-        return Ok(());
+    for pub_status in publication_status {
+        if matches!(pub_status, PublicationStatus::Published) {
+            println!("::set-output name=new_version::false");
+            println!("already published");
+            return Ok(());
+        }
     }
 
     println!("::set-output name=new_version::true");
-    println!("find new version");
+    println!("version not published");
 
     let com_res = Command::new("cargo")
         .arg("publish")
@@ -59,22 +64,63 @@ fn main() -> Presult<()> {
     Ok(())
 }
 
-fn get_published_version(name: &str) -> Presult<String> {
-    let client = SyncClient::new(
-        "tu6ge (772364230@qq.com)",
-        std::time::Duration::from_millis(1000),
-    )?;
-    let summary = client.get_crate(name)?;
-    Ok(summary.crate_data.max_version)
-}
+fn get_publication_status(
+    workspace_root: &str,
+) -> Presult<(String, String, Vec<PublicationStatus>)> {
+    let mut config = cargo::util::Config::default()?;
 
-fn get_new_info(dir: &str) -> Presult<(String, String)> {
-    let mut cargo_toml = PathBuf::from(dir);
+    config.configure(2, false, None, false, false, false, &None, &[], &[])?;
+    let mut cargo_toml = PathBuf::from(workspace_root);
     cargo_toml.push("Cargo.toml");
-    let manifest = Manifest::from_path(&cargo_toml)?;
+    cargo_toml = cargo_toml.canonicalize()?;
+    let workspace = Workspace::new(&cargo_toml, &config)?;
 
-    match manifest.package {
-        Some(v) => Ok((v.name, v.version)),
-        None => Err(Perror::Input("not found version in Cargo.toml".to_string())),
+    let package = workspace.current()?;
+    // Find where to publish
+    let publish_registries = package.publish();
+    let publish_registries = match publish_registries {
+        None => vec![CRATES_IO_REGISTRY.to_string()],
+        Some(v) => v.clone(),
+    };
+    if publish_registries.is_empty() {
+        return Err(Perror::PublishingDisabled);
     }
+    let _lock = config.acquire_package_cache_lock()?;
+    // now - for each publication target, check whether it has this version (or newer)
+    let mut statuses = vec![];
+    for registry in publish_registries {
+        let source_id = if registry == CRATES_IO_REGISTRY {
+            SourceId::crates_io(&config)?
+        } else {
+            SourceId::alt_registry(&config, &registry)?
+        };
+        let mut package_registry = cargo::core::registry::PackageRegistry::new(&config)?;
+        package_registry.lock_patches();
+        let dep = Dependency::parse(
+            package.name(),
+            Some(&package.version().to_string()),
+            source_id,
+        )?;
+        let summaries = loop {
+            match package_registry.query_vec(&dep, QueryKind::Exact)? {
+                Poll::Ready(deps) => break deps,
+                Poll::Pending => package_registry.block_until_ready()?,
+            }
+        };
+        let matched = summaries
+            .iter()
+            .filter(|s| s.version() == package.version())
+            .count()
+            > 0;
+        statuses.push(if matched {
+            PublicationStatus::Published
+        } else {
+            PublicationStatus::NotPublished
+        });
+    }
+    Ok((
+        package.name().to_string(),
+        package.version().to_string(),
+        statuses,
+    ))
 }
