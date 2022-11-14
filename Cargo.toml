@@ -1,12 +1,12 @@
 [package]
-name = "publish-action"
-version = "0.1.16"
-edition = "2021"
-license = "MIT"
-description = "Auto Publish Cargo with Github Action"
-keywords = ["github-action", "cargo","CI-CD", "publish"]
-repository = "https://github.com/tu6ge/publish-action"
 authors = ["tu6ge <772364230@qq.com>"]
+description = "Auto Publish Cargo with Github Action"
+edition = "2021"
+keywords = ["github-action", "cargo", "CI-CD", "publish"]
+license = "MIT"
+name = "publish-action"
+repository = "https://github.com/tu6ge/publish-action"
+version = "0.1.16"
 
 [[bin]]
 name = "publish-action"
@@ -18,8 +18,8 @@ cargo_toml = "0.11.5"
 crates_io_api = "0.8.0"
 dotenv = "0.15.0"
 futures = "0.3.21"
-thiserror = "1.0"
 json = "0.12.4"
+thiserror = "1.0"
 #openssl = "0.10.40"
-reqwest = {version ="0.11.10",features= ["blocking"]}
+reqwest = { version = "0.11.10", features = ["blocking"] }
 version-compare = "0.1.0"
