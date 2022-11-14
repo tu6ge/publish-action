@@ -18,12 +18,12 @@ fn main() -> Presult<()> {
 
     dotenv().ok();
 
-    let repositroy = env::var("GITHUB_REPOSITORY")?;
+    let repository = env::var("GITHUB_REPOSITORY")?;
     let branch = env::var("GITHUB_REF_NAME")?;
     let token = env::var("GITHUB_TOKEN")?;
     let path = env::var("GITHUB_WORKSPACE")?;
 
-    println!("repositroy: {}", repositroy);
+    println!("repository: {}", repository);
 
     let (name, version) = get_new_info(&path)?;
     println!("name: {}, version: {}", name, version);
@@ -49,7 +49,7 @@ fn main() -> Presult<()> {
         return Err(Perror::Input("publish command failed".to_string()));
     }
 
-    let gh = github::Github::new(&repositroy, &token);
+    let gh = github::Github::new(&repository, &token);
     let sha = gh.get_sha(&branch)?;
     println!("sha: {}", sha);
 
