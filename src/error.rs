@@ -23,14 +23,17 @@ pub enum Perror {
     #[error("io error {0}")]
     Io(#[from] std::io::Error),
 
-    #[error("CargoToml error {0}")]
-    CargoToml(#[from] cargo_toml::Error),
-
     #[error("InvalidHeaderValue {0}")]
     InvalidHeaderValue(#[from] reqwest::header::InvalidHeaderValue),
 
-    #[error("crates io api error {0}")]
-    CratesIoApi(#[from] crates_io_api::Error),
+    /// Cargo uses anyhow::Result which uses anyhow::Error, but not publically
+    /// exposed, so we must match the version of anyhow with the one cargo gets
+    /// built with.
+    #[error("cargo library error {0}")]
+    CargoError(#[from] anyhow::Error),
+
+    #[error("Publishing disabled")]
+    PublishingDisabled,
 }
 
 pub type Presult<T> = Result<T, Perror>;

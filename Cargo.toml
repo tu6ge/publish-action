@@ -14,12 +14,11 @@ name = "publish-action"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-cargo_toml = "0.11.5"
-crates_io_api = "0.8.0"
+anyhow = "1.0.66"
+cargo = "0.66.0"
 dotenv = "0.15.0"
 futures = "0.3.21"
 json = "0.12.4"
 thiserror = "1.0"
 #openssl = "0.10.40"
-reqwest = { version = "0.11.10", features = ["blocking"] }
-version-compare = "0.1.0"
+reqwest = { version = "0.11.10", features = ["blocking", "json"] }
