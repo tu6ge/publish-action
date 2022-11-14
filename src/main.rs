@@ -1,20 +1,21 @@
 //extern crate openssl;
 
+use std::env;
 use std::io::Read;
-use crates_io_api::{SyncClient};
-use cargo_toml::Manifest;
-use version_compare::{Cmp, compare_to};
 use std::process::Command;
-use dotenv::dotenv;
-use std::{env};
-use crate::error::{Perror,Presult};
 
-mod github;
+use crate::error::{Perror, Presult};
+use cargo_toml::Manifest;
+use crates_io_api::SyncClient;
+use dotenv::dotenv;
+use version_compare::{compare_to, Cmp};
+
 mod error;
+mod github;
 
 fn main() -> Presult<()> {
     //list_top_dependencies();
-    
+
     dotenv().ok();
 
     let repositroy = env::var("GITHUB_REPOSITORY")?;
@@ -24,7 +25,7 @@ fn main() -> Presult<()> {
 
     println!("repositroy: {}", repositroy);
 
-    let (name,version) = get_new_info(&path)?;
+    let (name, version) = get_new_info(&path)?;
     println!("name: {}, version: {}", name, version);
 
     let published_version = get_published_version(&name)?;
@@ -38,18 +39,18 @@ fn main() -> Presult<()> {
 
     println!("::set-output name=new_version::true");
     println!("find new version");
-    
 
-    let com_res = Command::new("cargo").arg("publish")
+    let com_res = Command::new("cargo")
+        .arg("publish")
         .current_dir(&path)
         .status()?;
-    if com_res.success()==false {
+    if com_res.success() == false {
         println!("::set-output name=publish::false");
         return Err(Perror::Input("publish command failed".to_string()));
     }
-    
+
     let gh = github::Github::new(&repositroy, &token);
-    let sha =  gh.get_sha(&branch)?;
+    let sha = gh.get_sha(&branch)?;
     println!("sha: {}", sha);
 
     gh.set_ref(&version, &sha)?;
@@ -59,17 +60,16 @@ fn main() -> Presult<()> {
     Ok(())
 }
 
-
 fn get_published_version(name: &str) -> Presult<String> {
     let client = SyncClient::new(
-         "tu6ge (772364230@qq.com)",
-         std::time::Duration::from_millis(1000),
+        "tu6ge (772364230@qq.com)",
+        std::time::Duration::from_millis(1000),
     )?;
     let summary = client.get_crate(name)?;
     Ok(summary.crate_data.max_version)
 }
 
-fn get_new_info(path: &str) -> Presult<(String,String)> {
+fn get_new_info(path: &str) -> Presult<(String, String)> {
     let mut content: Vec<u8> = Vec::new();
     let mut path = String::from(path);
     path.push_str("/Cargo.toml");
@@ -81,7 +81,7 @@ fn get_new_info(path: &str) -> Presult<(String,String)> {
     let info = Manifest::from_slice(&content)?;
 
     match info.package {
-        Some(v) => Ok((v.name,v.version)),
-        None => Err(Perror::Input("not found version in Cargo.toml".to_string()))
+        Some(v) => Ok((v.name, v.version)),
+        None => Err(Perror::Input("not found version in Cargo.toml".to_string())),
     }
 }
