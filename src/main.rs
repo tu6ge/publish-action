@@ -31,7 +31,7 @@ fn main() -> Presult<()> {
     let published_version = get_published_version(&name)?;
     println!("published version: {}", published_version);
 
-    if compare_to(&version, &published_version, Cmp::Gt).unwrap() == false {
+    if !compare_to(&version, &published_version, Cmp::Gt).unwrap() {
         println!("not find new version");
         println!("::set-output name=new_version::false");
         return Ok(());
@@ -44,7 +44,7 @@ fn main() -> Presult<()> {
         .arg("publish")
         .current_dir(&path)
         .status()?;
-    if com_res.success() == false {
+    if !com_res.success() {
         println!("::set-output name=publish::false");
         return Err(Perror::Input("publish command failed".to_string()));
     }
