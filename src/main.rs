@@ -2,7 +2,7 @@
 
 use std::io::Read;
 use crates_io_api::{SyncClient};
-use cargo_toml::Manifest;
+use cargo_toml::{Inheritable, Manifest};
 use version_compare::{Cmp, compare_to};
 use std::process::Command;
 use dotenv::dotenv;
@@ -81,7 +81,13 @@ fn get_new_info(path: &str) -> Presult<(String,String)> {
     let info = Manifest::from_slice(&content)?;
 
     match info.package {
-        Some(v) => Ok((v.name,v.version)),
+        Some(v) => {
+            let version = match v.version {
+                Inheritable::Set(version) => version,
+                Inheritable::Inherited{..} => panic!("Inherited versions not yet supported")
+            };
+            Ok((v.name,version))
+        },
         None => Err(Perror::Input("not found version in Cargo.toml".to_string()))
     }
 }
