@@ -5,8 +5,54 @@ on:
     branches: [ master ]
 
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    name: "check"
+    strategy:
+      matrix:
+        rust:
+          - stable
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: setup rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.rust }}
+          override: true
+          components: rustfmt, clippy
+
+      - name: setup caching
+        uses: Swatinem/rust-cache@v2
+
+      - name: build
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+
+      - name: test
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+
+      - name: fmt
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --all -- --check
+
+      - name: clippy
+        if: ${{ matrix.rust == 'stable' }}
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: --all-features -- -D warnings
   publish:
     runs-on: ubuntu-latest
+    needs: check
 
     name: 'publish'
 
