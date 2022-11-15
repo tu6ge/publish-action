@@ -60,13 +60,13 @@ jobs:
           cache-name: cache-publish-action
         with:
           path: ~/.cargo
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-v0.1.15
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-v0.2.0
 
       # install publish-action by cargo in github action
       - name: Install publish-action
         if: steps.cache-publish-action.outputs.cache-hit != 'true'
         run:
-          cargo install publish-action --version=0.1.15
+          cargo install publish-action --version=0.2.0
       
       - name: Run publish-action
         id: publish-action
@@ -87,3 +87,7 @@ jobs:
 5. You can push to github with new github action. this is finished.
 
 Now you change Cargo.toml, this can auto running.
+
+## Support custom registries `+0.2`
+
+using an alternate registry , This is [Documentation](https://doc.rust-lang.org/cargo/reference/registries.html#using-an-alternate-registry)
