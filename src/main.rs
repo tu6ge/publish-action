@@ -5,6 +5,7 @@ use std::{process::Command, task::Poll};
 
 use crate::error::{Perror, Presult};
 use cargo::core::{Dependency, QueryKind, Registry, SourceId, Workspace};
+#[cfg(test)]
 use dotenv::dotenv;
 
 mod error;
@@ -21,6 +22,7 @@ enum PublicationStatus {
 fn main() -> Presult<()> {
     //list_top_dependencies();
 
+    #[cfg(test)]
     dotenv().ok();
 
     let repository = env::var("GITHUB_REPOSITORY")?;
