@@ -5,6 +5,7 @@ pub enum Perror {
     #[error("reqwest error")]
     Request(#[from] reqwest::Error),
 
+    #[cfg(test)]
     #[error("{0}")]
     Dotenv(#[from] dotenv::Error),
 
