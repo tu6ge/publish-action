@@ -6,6 +6,6 @@ pub fn main() {
         .write(true)
         .open("a.txt")
         .unwrap();
-    file.write("111\n".as_bytes()).expect("write faild");
-    file.write("222\n".as_bytes()).expect("write faild");
+    file.write_all("111\n".as_bytes()).expect("write faild");
+    file.write_all("222\n".as_bytes()).expect("write faild");
 }
