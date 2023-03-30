@@ -37,13 +37,15 @@ fn main() -> Presult<()> {
 
     for pub_status in publication_status {
         if matches!(pub_status, PublicationStatus::Published) {
-            println!("::set-output name=new_version::false");
+            //println!("::set-output name=new_version::false");
+            set_output("new_version=false");
             println!("already published");
             return Ok(());
         }
     }
 
-    println!("::set-output name=new_version::true");
+    //println!("::set-output name=new_version::true");
+    set_output("new_version=true");
     println!("version not published");
 
     let com_res = Command::new("cargo")
@@ -51,7 +53,8 @@ fn main() -> Presult<()> {
         .current_dir(&path)
         .status()?;
     if !com_res.success() {
-        println!("::set-output name=publish::false");
+        //println!("::set-output name=publish::false");
+        set_output("publish=false");
         return Err(Perror::Input("publish command failed".to_string()));
     }
 
@@ -61,7 +64,8 @@ fn main() -> Presult<()> {
 
     gh.set_ref(&version, &sha)?;
     println!("new version {} is created", &version);
-    println!("::set-output name=publish::true");
+    //println!("::set-output name=publish::true");
+    set_output("publish=true");
 
     Ok(())
 }
@@ -125,4 +129,19 @@ fn get_publication_status(
         package.version().to_string(),
         statuses,
     ))
+}
+
+fn set_output(info: &'static str) {
+    use std::fs;
+    use std::io::Write;
+
+    let path = env::var("GITHUB_OUTPUT").expect("no found GITHUB_OUTPUT environment");
+    let mut file = fs::File::options()
+        .append(true)
+        .write(true)
+        .open(path)
+        .expect("open GITHUB_OUTPUT file failed");
+    file.write(info.as_bytes())
+        .expect("write output content faild");
+    file.write("\n".as_bytes()).expect("write output \n faild");
 }
