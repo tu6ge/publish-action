@@ -141,7 +141,7 @@ fn set_output(info: &'static str) {
         .write(true)
         .open(path)
         .expect("open GITHUB_OUTPUT file failed");
-    file.write(info.as_bytes())
+    file.write_all(info.as_bytes())
         .expect("write output content faild");
-    file.write("\n".as_bytes()).expect("write output \n faild");
+    file.write_all(b"\n").expect("write output \n faild");
 }
