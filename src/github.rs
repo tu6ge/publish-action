@@ -3,8 +3,8 @@
 use std::collections::HashMap;
 
 use crate::error::{Perror, Presult};
-use json::JsonValue;
 use reqwest::{blocking, Method};
+use serde_json::Value as JsonValue;
 
 pub struct Github<'a> {
     repositroy: &'a str,
@@ -52,10 +52,10 @@ impl<'a> Github<'a> {
         }
 
         if response.status() == 204 {
-            return Ok(JsonValue::new_object());
+            return Ok(JsonValue::Null);
         }
 
-        let result = json::parse(&response.text()?)?;
+        let result = serde_json::from_str(&response.text()?)?;
         Ok(result)
     }
 

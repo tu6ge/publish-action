@@ -13,7 +13,7 @@ pub enum Perror {
     VarError(#[from] std::env::VarError),
 
     #[error("json error")]
-    JsonError(#[from] json::JsonError),
+    JsonError(#[from] serde_json::Error),
 
     #[error("input data is not valid")]
     Input(String),
