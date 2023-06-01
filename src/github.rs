@@ -91,3 +91,15 @@ impl<'a> Github<'a> {
         Ok(())
     }
 }
+
+// #[cfg(test)]
+// mod tests {
+//     use super::Github;
+
+//     #[test]
+//     fn set_ref() {
+//         let github = Github::new("tu6ge/oss-rs", "");
+
+//         let res = github.set_ref("test-tagss", "xxx");
+//     }
+// }
