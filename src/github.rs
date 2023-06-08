@@ -63,7 +63,10 @@ impl<'a> Github<'a> {
     pub fn get_sha(&self, head: &str) -> Presult<String> {
         let url = String::from("git/matching-refs/heads/") + head;
         let json = self.client(Method::GET, &url, None)?;
-        let sha: String = json[0]["object"]["sha"].to_string();
+        let sha = json[0]["object"]["sha"]
+            .as_str()
+            .ok_or(Perror::GetTagFailed)?
+            .to_string();
         Ok(sha)
     }
 

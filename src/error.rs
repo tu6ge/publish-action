@@ -35,6 +35,9 @@ pub enum Perror {
 
     #[error("Publishing disabled")]
     PublishingDisabled,
+
+    #[error("get tag failed")]
+    GetTagFailed,
 }
 
 pub type Presult<T> = Result<T, Perror>;
