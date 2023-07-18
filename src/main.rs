@@ -154,16 +154,15 @@ mod tests {
 
     #[test]
     fn test_set_output() {
-        let tmpfile = tempfile::NamedTempFile::new().unwrap();
+        let mut tmpfile = tempfile::NamedTempFile::new().unwrap();
 
         let path = tmpfile.path();
         env::set_var("GITHUB_OUTPUT", path);
         set_output("111=222");
         set_output("333=444");
 
-        let mut file = tmpfile.as_file();
         let mut content = String::new();
-        file.read_to_string(&mut content).unwrap();
+        tmpfile.read_to_string(&mut content).unwrap();
 
         assert_eq!(content, "111=222\n333=444\n");
     }
