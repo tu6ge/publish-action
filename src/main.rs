@@ -70,9 +70,12 @@ fn main() -> Presult<()> {
     Ok(())
 }
 
+type Name = String;
+type Version = String;
+
 fn get_publication_status(
     workspace_root: &str,
-) -> Presult<(String, String, Vec<PublicationStatus>)> {
+) -> Presult<(Name, Version, Vec<PublicationStatus>)> {
     let mut config = cargo::util::Config::default()?;
 
     config.configure(2, false, None, false, false, false, &None, &[], &[])?;
@@ -93,7 +96,7 @@ fn get_publication_status(
     }
     let _lock = config.acquire_package_cache_lock()?;
     // now - for each publication target, check whether it has this version (or newer)
-    let mut statuses = vec![];
+    let mut statuses = Vec::with_capacity(publish_registries.len());
     for registry in publish_registries {
         let source_id = if registry == CRATES_IO_REGISTRY {
             SourceId::crates_io(&config)?
