@@ -4,7 +4,10 @@ use std::{env, path::PathBuf};
 use std::{process::Command, task::Poll};
 
 use crate::error::{Perror, Presult};
-use cargo::{core::{Dependency, Registry, SourceId, Workspace}, sources::source::QueryKind};
+use cargo::{
+    core::{Dependency, Registry, SourceId, Workspace},
+    sources::source::QueryKind,
+};
 #[cfg(test)]
 use dotenv::dotenv;
 
