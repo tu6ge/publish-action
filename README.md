@@ -9,7 +9,7 @@ If you have a cargo repository, When you publish new version, The following step
 3. Publish to crates.io
 4. Push to github
 
-Sometimes, We forget tagging the github repository. So I created the github action.
+Sometimes, We forget to tagging the github repository. So I created the github action.
 
 Now, you only need update version in Cargo.toml, after you push to github, the github action can auto tagging the github repository,
 and publish to crates.io with new version.
@@ -26,7 +26,7 @@ After run the action, you can judge the state (find new version or not, publish 
 
 1. You should create a crates.io's token in https://crates.io/settings/tokens . and copy the token.
 
-2. Open you repository settings, find Environments Settings Page(https://github.com/xxx/xxx/settings/environments). Create a new environments width
+2. Open you repository settings page, find Environments Settings Page(https://github.com/xxx/xxx/settings/environments). Create a new environments width
 name is `cargo`, and add a environment secrets namd `CARGO_REGISTRY_TOKEN`, this value is step one's token.
 
 3. Open actions settings, select **Read and write permissions** option in *Workflow permissions*, and save it.
