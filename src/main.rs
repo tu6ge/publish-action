@@ -32,6 +32,7 @@ fn main() -> Presult<()> {
     let branch = env::var("GITHUB_REF_NAME")?;
     let token = env::var("GITHUB_TOKEN")?;
     let path = env::var("GITHUB_WORKSPACE")?;
+    let project = env::var("PROJECT").ok();
 
     let (name, version, publication_status) = get_publication_status(&path)?;
     println!("repository: {}", repository);
@@ -50,11 +51,18 @@ fn main() -> Presult<()> {
     //println!("::set-output name=new_version::true");
     set_output("new_version=true");
     println!("version not published");
-
-    let com_res = Command::new("cargo")
-        .arg("publish")
-        .current_dir(&path)
-        .status()?;
+    let com_res = match project {
+        Some(p) => Command::new("cargo")
+            .arg("publish")
+            .arg("-p")
+            .arg(&p)
+            .current_dir(&path)
+            .status()?,
+        None => Command::new("cargo")
+            .arg("publish")
+            .current_dir(&path)
+            .status()?,
+    };
     if !com_res.success() {
         //println!("::set-output name=publish::false");
         set_output("publish=false");
@@ -86,8 +94,13 @@ fn get_publication_status(
     cargo_toml.push("Cargo.toml");
     cargo_toml = cargo_toml.canonicalize()?;
     let workspace = Workspace::new(&cargo_toml, &config)?;
-
-    let package = workspace.current()?;
+    let project = env::var("PROJECT").ok();
+    let package = match project {
+        None => { workspace.current()? }
+        Some(project) => {
+            workspace.default_members().find(|p| p.name().to_string() == project).ok_or(Perror::Input("project not found".to_string()))?
+        }
+    };
     // Find where to publish
     let publish_registries = package.publish();
     let publish_registries = match publish_registries {
@@ -155,6 +168,8 @@ fn set_output(info: &'static str) {
 #[cfg(test)]
 mod tests {
     use std::{env, io::Read};
+    use std::ffi::OsStr;
+    use std::process::Command;
 
     use crate::set_output;
 
@@ -171,5 +186,19 @@ mod tests {
         tmpfile.read_to_string(&mut content).unwrap();
 
         assert_eq!(content, "111=222\n333=444\n");
+    }
+
+    #[test]
+    fn test_commend() {
+        env::set_var("PROJECT", "project");
+        let project = env::var("PROJECT").ok();
+        let args = match project {
+            Some(p) => format!("publish -p {}", p),
+            None => "publish".to_string(),
+        };
+        let mut cmd = Command::new("cargo");
+        let cmd = cmd.arg(args);
+        let args = cmd.get_args().collect::<Vec<&OsStr>>();
+        assert_eq!(args, vec!["publish -p project"]);
     }
 }
