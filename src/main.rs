@@ -32,6 +32,7 @@ fn main() -> Presult<()> {
     let branch = env::var("GITHUB_REF_NAME")?;
     let token = env::var("GITHUB_TOKEN")?;
     let path = env::var("GITHUB_WORKSPACE")?;
+    let project = env::var("PROJECT").ok();
 
     let (name, version, publication_status) = get_publication_status(&path)?;
     println!("repository: {}", repository);
@@ -50,9 +51,12 @@ fn main() -> Presult<()> {
     //println!("::set-output name=new_version::true");
     set_output("new_version=true");
     println!("version not published");
-
+    let args = match project {
+        Some(p) => format!("publish -p {}", p),
+        None => "publish".to_string(),
+    };
     let com_res = Command::new("cargo")
-        .arg("publish")
+        .arg(args)
         .current_dir(&path)
         .status()?;
     if !com_res.success() {
@@ -155,6 +159,8 @@ fn set_output(info: &'static str) {
 #[cfg(test)]
 mod tests {
     use std::{env, io::Read};
+    use std::ffi::OsStr;
+    use std::process::Command;
 
     use crate::set_output;
 
@@ -171,5 +177,19 @@ mod tests {
         tmpfile.read_to_string(&mut content).unwrap();
 
         assert_eq!(content, "111=222\n333=444\n");
+    }
+
+    #[test]
+    fn test_commend() {
+        env::set_var("PROJECT", "project");
+        let project = env::var("PROJECT").ok();
+        let args = match project {
+            Some(p) => format!("publish -p {}", p),
+            None => "publish".to_string(),
+        };
+        let mut cmd = Command::new("cargo");
+        let cmd = cmd.arg(args);
+        let args = cmd.get_args().collect::<Vec<&OsStr>>();
+        assert_eq!(args, vec!["publish -p project"]);
     }
 }
