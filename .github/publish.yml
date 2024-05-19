@@ -1,7 +1,7 @@
 projects:
   - name: project1
     #dir: "."
-    #tag_prefix: "v"
+    tag_prefix: "v"
 
   - name: project2
     dir: "/project2/"
