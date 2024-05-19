@@ -93,7 +93,6 @@ fn set_output(info: &'static str) {
     let path = env::var("GITHUB_OUTPUT").expect("no found GITHUB_OUTPUT environment");
     let mut file = fs::File::options()
         .append(true)
-        .write(true)
         .open(path)
         .expect("open GITHUB_OUTPUT file failed");
     file.write_all(info.as_bytes())
