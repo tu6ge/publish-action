@@ -24,6 +24,7 @@ pub(crate) fn publish(path: Option<String>, tag_prefix: Option<String>) -> Presu
     let mut gh_path = env::var("GITHUB_WORKSPACE")?;
 
     if let Some(path) = path {
+        println!("gh_path += &path");
         gh_path += &path;
     }
 
@@ -80,16 +81,19 @@ fn get_publication_status(
     workspace_root: &str,
 ) -> Presult<(Name, Version, Vec<PublicationStatus>)> {
     let mut config = cargo::util::Config::default()?;
+    println!("config init");
 
     config.configure(2, false, None, false, false, false, &None, &[], &[])?;
     let mut cargo_toml = PathBuf::from(workspace_root);
     cargo_toml.push("Cargo.toml");
-    cargo_toml = cargo_toml.canonicalize()?;
     println!(
         "workspace_root: {}, cargo_toml {}",
         workspace_root,
         cargo_toml.display()
     );
+    cargo_toml = cargo_toml.canonicalize()?;
+    println!("canonicalize finished");
+    
     let workspace = Workspace::new(&cargo_toml, &config)?;
 
     let package = workspace.current()?;
