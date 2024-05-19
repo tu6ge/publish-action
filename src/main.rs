@@ -3,10 +3,10 @@
 use std::collections::HashSet;
 use std::fs::{read_to_string, File};
 use std::io::Read;
-use std::{env, path::Path};
 use std::process::Command;
+use std::{env, path::Path};
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::error::{Perror, Presult};
 
@@ -53,9 +53,7 @@ struct ProjectList {
 }
 
 impl ProjectList {
-
     fn check_same_error(&self) -> bool {
-
         let mut dirs = HashSet::new();
         let mut prefixes = HashSet::new();
         let mut default_dir_total = 0_u8;
@@ -63,33 +61,30 @@ impl ProjectList {
         for it in self.projects.iter() {
             if let Some(path) = it.dir.clone() {
                 dirs.insert(path);
-            } else{
-                default_dir_total +=1;
+            } else {
+                default_dir_total += 1;
             }
             if let Some(p) = it.tag_prefix.clone() {
                 prefixes.insert(p);
-            }else{
-                default_prefix_total +=1;
+            } else {
+                default_prefix_total += 1;
             }
-            
         }
 
-        if default_dir_total>1 {
-            return false
+        if default_dir_total > 1 {
+            return false;
         }
-        if default_prefix_total>1 {
+        if default_prefix_total > 1 {
             return false;
         }
         if dirs.len() + (default_dir_total as usize) < self.projects.len() {
-            return false
+            return false;
         }
         if prefixes.len() + (default_prefix_total as usize) < self.projects.len() {
-            return false
+            return false;
         }
 
         true
-
-
     }
 }
 
