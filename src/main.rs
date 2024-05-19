@@ -22,7 +22,11 @@ fn main() -> Presult<()> {
     #[cfg(test)]
     dotenv().ok();
 
-    let config_str = read_to_string("./.github/publish.yml")?;
+    let mut gh_path = env::var("GITHUB_WORKSPACE")?;
+
+    gh_path += "/.github/publish.yml";
+
+    let config_str = read_to_string(gh_path)?;
     let config: ProjectList = serde_yaml::from_str(&config_str).unwrap();
 
     println!("{:?}", config);
