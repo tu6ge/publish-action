@@ -29,7 +29,7 @@ fn main() -> Presult<()> {
     let config_str = read_to_string(gh_path)?;
     let config: ProjectList = serde_yaml::from_str(&config_str).unwrap();
 
-    println!("{:?}", config);
+    println!("config: {:?}", config);
 
     if !config.check_same_error() {
         panic!("this config have repeat projectes");
