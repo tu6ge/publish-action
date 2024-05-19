@@ -93,7 +93,7 @@ fn get_publication_status(
     );
     cargo_toml = cargo_toml.canonicalize()?;
     println!("canonicalize finished");
-    
+
     let workspace = Workspace::new(&cargo_toml, &config)?;
 
     let package = workspace.current()?;
