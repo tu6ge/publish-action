@@ -85,6 +85,11 @@ fn get_publication_status(
     let mut cargo_toml = PathBuf::from(workspace_root);
     cargo_toml.push("Cargo.toml");
     cargo_toml = cargo_toml.canonicalize()?;
+    println!(
+        "workspace_root: {}, cargo_toml {}",
+        workspace_root,
+        cargo_toml.display()
+    );
     let workspace = Workspace::new(&cargo_toml, &config)?;
 
     let package = workspace.current()?;
