@@ -24,7 +24,7 @@ pub(crate) fn publish(path: Option<String>, tag_prefix: Option<String>) -> Presu
     let mut gh_path = env::var("GITHUB_WORKSPACE")?;
 
     if let Some(path) = path {
-      gh_path += &path;
+        gh_path += &path;
     }
 
     let (name, version, publication_status) = get_publication_status(&gh_path)?;
@@ -60,8 +60,8 @@ pub(crate) fn publish(path: Option<String>, tag_prefix: Option<String>) -> Presu
     println!("sha: {}", sha);
 
     let mut tag = match tag_prefix {
-      Some(p) => p, 
-      None => "".to_string(),
+        Some(p) => p,
+        None => "".to_string(),
     };
     tag += &version;
 
