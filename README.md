@@ -91,3 +91,23 @@ Now you change Cargo.toml, this can auto running.
 ## Support custom registries `+0.2`
 
 using an alternate registry , This is [Documentation](https://doc.rust-lang.org/cargo/reference/registries.html#using-an-alternate-registry)
+
+## Support multiple projects `+0.3`
+
+Add yaml file `.github/publish.yml`, such as:
+```yaml
+projects:
+  - name: project1
+    #dir: "."
+    tag_prefix: "v"
+
+  - name: project2
+    dir: "/project2/"
+    tag_prefix: "p2v_"
+
+  - name: project3
+    dir: "/project3/"
+    tag_prefix: "p3v_"
+```
+
+if `dir` is empty, this default is root dir, if `tag_prefix` is empty, tag prefix is none, and finaly tag is only `x.x.x` .
