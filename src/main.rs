@@ -1,14 +1,12 @@
 //extern crate openssl;
 
 use std::collections::HashSet;
-use std::fs::{read_to_string, File};
-use std::io::Read;
-use std::process::Command;
-use std::{env, path::Path};
+use std::env;
+use std::fs::read_to_string;
 
 use serde::{Deserialize, Serialize};
 
-use crate::error::{Perror, Presult};
+use crate::error::Presult;
 
 #[cfg(test)]
 use dotenv::dotenv;
