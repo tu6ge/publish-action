@@ -26822,9 +26822,7 @@ try {
   const tag_prefix = core.getInput("tag_prefix");
   // const dir = "/";
   // const tag_prefix = "";
-  const publish = spawn(`cargo`, ['run', '-r', '--', 
-    '-d', dir, '-t', tag_prefix,
-  ]);
+  const publish = spawn(`cargo`, ['run', '-r', '--', '-d', dir, '-t', tag_prefix]);
 
   publish.stdout.on('data', (data)=> {
     //console.log(data.toString());
