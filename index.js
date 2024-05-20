@@ -1,13 +1,12 @@
 const core = require('@actions/core');
-const { exec } = require('child_process');
+const run = require('execa');
 
 try {
   const dir = core.getInput("dir");
   const tag_prefix = core.getInput("tag_prefix");
-  exec(`publish-action`, ['-d', dir, '-t', tag_prefix], (error, stdout, stderr) => {
+  run(`publish-action`, ['-d', dir, '-t', tag_prefix]).then(({stdout, stderr})=>{
     core.setOutput(stdout);
     core.setFailed(stderr);
-
   });
 
   // publish.stdout.on('data', (data)=> {
