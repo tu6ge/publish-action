@@ -32,7 +32,7 @@ fn main() -> Presult<()> {
         Some(config) => {
             let mut gh_path = env::var("GITHUB_WORKSPACE")?;
 
-            gh_path += if config.len() == 0 {
+            gh_path += if config.is_empty() {
                 "/.github/publish.yml"
             } else {
                 &config
