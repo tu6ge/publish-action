@@ -9,3 +9,7 @@ inputs:
     description: "The tag prefix to be generated"
     required: false
     default: ""
+
+runs:
+  using: 'node20'
+  main: 'index.js'
