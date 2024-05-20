@@ -10,6 +10,8 @@ try {
     core.setOutput(data);
   })
   publish.stderr.on('data', (data)=> {
+    core.console.error(data);
+    core.console.error(data.data);
     core.setFailed(data);
   });
 
