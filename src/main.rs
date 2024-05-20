@@ -4,6 +4,7 @@ use std::collections::HashSet;
 use std::env;
 use std::fs::read_to_string;
 
+use clap::Parser;
 use serde::{Deserialize, Serialize};
 
 use crate::error::Presult;
@@ -22,24 +23,53 @@ fn main() -> Presult<()> {
     #[cfg(test)]
     dotenv().ok();
 
-    let mut gh_path = env::var("GITHUB_WORKSPACE")?;
+    let cli = Cli::parse();
 
-    gh_path += "/.github/publish.yml";
+    let dir = cli.dir;
+    let tag_prefix = cli.tag_prefix;
 
-    let config_str = read_to_string(gh_path)?;
-    let config: ProjectList = serde_yaml::from_str(&config_str).unwrap();
+    match cli.config {
+        Some(config) => {
+            let mut gh_path = env::var("GITHUB_WORKSPACE")?;
 
-    println!("config: {:?}", config);
+            gh_path += if config.len() == 0 {
+                "/.github/publish.yml"
+            } else {
+                &config
+            };
 
-    if !config.check_same_error() {
-        panic!("this config have repeat projectes");
-    }
+            let config_str = read_to_string(gh_path)?;
+            let config: ProjectList = serde_yaml::from_str(&config_str).unwrap();
 
-    for item in config.projects.into_iter() {
-        publish(item.dir, item.tag_prefix)?;
+            println!("config: {:?}", config);
+
+            if !config.check_same_error() {
+                panic!("this config have repeat projectes");
+            }
+
+            for item in config.projects.into_iter() {
+                publish(item.dir, item.tag_prefix)?;
+            }
+        }
+        None => {
+            publish(dir, tag_prefix)?;
+        }
     }
 
     Ok(())
+}
+
+#[derive(Parser)]
+#[command(version, about, long_about = None)]
+struct Cli {
+    #[arg(short, long)]
+    dir: Option<String>,
+
+    #[arg(short, long)]
+    tag_prefix: Option<String>,
+
+    #[arg(short, long)]
+    config: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
