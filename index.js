@@ -7,10 +7,10 @@ try {
   const tag_prefix = core.getInput("tag_prefix");
   // const dir = "/";
   // const tag_prefix = "";
-  let path = process.env.GITHUB_WORKSPACE;
+  //let path = process.env.GITHUB_WORKSPACE;
   
-  const publish = spawn(`cargo`, ['run', '-r', '--', '-d', dir, '-t', tag_prefix], {
-    cwd: path,
+  const publish = spawn(`publish-action`, ['-d', dir, '-t', tag_prefix], {
+    //cwd: path,
   });
 
   publish.stdout.on('data', (data)=> {
