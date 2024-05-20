@@ -26815,19 +26815,25 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 const core = __nccwpck_require__(5127);
-const { spawn } = __nccwpck_require__(2081);
+const { exec } = __nccwpck_require__(2081);
 
 try {
   const dir = core.getInput("dir");
   const tag_prefix = core.getInput("tag_prefix");
-  const publish = spawn('publish-action', ['-d', dir, '-t', tag_prefix]);
+  exec(`publish-action -d ${dir} -t ${tag_prefix}`, (error, stdout, stderr) => {
+    core.setOutput(stdout);
+    core.setFailed(stderr);
 
-  publish.stdout.on('data', (data)=> {
-    core.setOutput(data);
-  })
-  publish.stderr.on('data', (data)=> {
-    core.setFailed(data);
   });
+
+  // publish.stdout.on('data', (data)=> {
+  //   core.setOutput(data);
+  // })
+  // publish.stderr.on('data', (data)=> {
+  //   core.console.error(data);
+  //   core.console.error(data.data);
+  //   core.setFailed(data);
+  // });
 
 } catch(e) {
   core.setFailed(e.message);
