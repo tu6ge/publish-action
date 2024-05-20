@@ -24916,14 +24916,6 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 5330:
-/***/ ((module) => {
-
-module.exports = eval("require")("execa");
-
-
-/***/ }),
-
 /***/ 9491:
 /***/ ((module) => {
 
@@ -24945,6 +24937,14 @@ module.exports = require("async_hooks");
 
 "use strict";
 module.exports = require("buffer");
+
+/***/ }),
+
+/***/ 2081:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("child_process");
 
 /***/ }),
 
@@ -26815,26 +26815,28 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 const core = __nccwpck_require__(5127);
-const run = __nccwpck_require__(5330);
+const {spawn} = __nccwpck_require__(2081);
 
 try {
   const dir = core.getInput("dir");
   const tag_prefix = core.getInput("tag_prefix");
-  run(`publish-action`, ['-d', dir, '-t', tag_prefix]).then(({stdout, stderr})=>{
-    core.setOutput(stdout);
-    core.setFailed(stderr);
+  // const dir = "/";
+  // const tag_prefix = "";
+  const publish = spawn(`cargo`, ['run', '-r', '--', 
+    '-d', dir, '-t', tag_prefix,
+  ]);
+
+  publish.stdout.on('data', (data)=> {
+    //console.log(data.toString());
+    core.setOutput(data.toString())
+  })
+  publish.stderr.on('data', (data)=> {
+    //console.error(data.toString());
+    core.setOutput(data.toString())
   });
 
-  // publish.stdout.on('data', (data)=> {
-  //   core.setOutput(data);
-  // })
-  // publish.stderr.on('data', (data)=> {
-  //   core.console.error(data);
-  //   core.console.error(data.data);
-  //   core.setFailed(data);
-  // });
-
 } catch(e) {
+  //console.error("eeeeeee", e.message);
   core.setFailed(e.message);
 }
 })();

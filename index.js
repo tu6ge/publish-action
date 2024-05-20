@@ -1,23 +1,25 @@
 const core = require('@actions/core');
-const run = require('execa');
+const {spawn} = require('child_process');
 
 try {
   const dir = core.getInput("dir");
   const tag_prefix = core.getInput("tag_prefix");
-  run(`publish-action`, ['-d', dir, '-t', tag_prefix]).then(({stdout, stderr})=>{
-    core.setOutput(stdout);
-    core.setFailed(stderr);
+  // const dir = "/";
+  // const tag_prefix = "";
+  const publish = spawn(`cargo`, ['run', '-r', '--', 
+    '-d', dir, '-t', tag_prefix,
+  ]);
+
+  publish.stdout.on('data', (data)=> {
+    //console.log(data.toString());
+    core.setOutput(data.toString())
+  })
+  publish.stderr.on('data', (data)=> {
+    //console.error(data.toString());
+    core.setOutput(data.toString())
   });
 
-  // publish.stdout.on('data', (data)=> {
-  //   core.setOutput(data);
-  // })
-  // publish.stderr.on('data', (data)=> {
-  //   core.console.error(data);
-  //   core.console.error(data.data);
-  //   core.setFailed(data);
-  // });
-
 } catch(e) {
+  //console.error("eeeeeee", e.message);
   core.setFailed(e.message);
 }
