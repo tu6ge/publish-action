@@ -26815,6 +26815,7 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 const core = __nccwpck_require__(5127);
+//const github = require('@actions/github');
 const {spawn} = __nccwpck_require__(2081);
 
 try {
@@ -26822,7 +26823,11 @@ try {
   const tag_prefix = core.getInput("tag_prefix");
   // const dir = "/";
   // const tag_prefix = "";
-  const publish = spawn(`cargo`, ['run', '-r', '--', '-d', dir, '-t', tag_prefix]);
+  let path = process.env.GITHUB_WORKSPACE;
+  
+  const publish = spawn(`cargo`, ['run', '-r', '--', '-d', dir, '-t', tag_prefix], {
+    cwd: path,
+  });
 
   publish.stdout.on('data', (data)=> {
     //console.log(data.toString());
