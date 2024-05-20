@@ -1,6 +1,11 @@
 name: '@tu6ge/publish-action'
 descripton: 'Auto publish cargo when git push new cargo.toml version, and tagging it by this version'
-
-runs:
-  using: 'docker'
-  image: 'Dockerfile'
+inputs:
+  dir: 
+    description: 'Crate package dirname'
+    required: false
+    default: "/"
+  tag_prefix:
+    description: "The tag prefix to be generated"
+    required: false
+    default: ""
