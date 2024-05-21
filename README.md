@@ -112,5 +112,5 @@ projects:
 
 if `dir` is empty, this default is root dir, if `tag_prefix` is empty, tag prefix is none, and finaly tag is only `x.x.x` .
 
-the `publish-action` command add three arguments: `dir`, `tag_prefix` and `config`, you can use first two arguments publish once, and using
+the `publish-action` command add three arguments: `dir`, `tag-prefix` and `config`, you can use first two arguments publish once, and using
 third argument publish more crates, when `config`'s value is `""`, this command will found `.github/publish.yml` config file.
