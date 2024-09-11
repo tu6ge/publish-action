@@ -23,38 +23,11 @@ fn main() -> Presult<()> {
     #[cfg(test)]
     dotenv().ok();
 
-    let cli = Cli::parse();
+    let dir = env::var("DIR")?;
+    ;
+    let tag_prefix = env::var("TAG_PREFIX")?;
 
-    let dir = cli.dir;
-    let tag_prefix = cli.tag_prefix;
-
-    match cli.config {
-        Some(config) => {
-            let mut gh_path = env::var("GITHUB_WORKSPACE")?;
-
-            gh_path += if config.is_empty() {
-                "/.github/publish.yml"
-            } else {
-                &config
-            };
-
-            let config_str = read_to_string(gh_path)?;
-            let config: ProjectList = serde_yaml::from_str(&config_str).unwrap();
-
-            println!("config: {:?}", config);
-
-            if !config.check_same_error() {
-                panic!("this config have repeat projectes");
-            }
-
-            for item in config.projects.into_iter() {
-                publish(item.dir, item.tag_prefix)?;
-            }
-        }
-        None => {
-            publish(dir, tag_prefix)?;
-        }
-    }
+    publish(Some(dir), Some(tag_prefix))?;
 
     Ok(())
 }
