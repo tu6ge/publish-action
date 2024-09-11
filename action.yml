@@ -12,4 +12,4 @@ inputs:
 
 runs:
   using: 'docker'
-  image: 'docker://ghcr.io/tu6ge/publish-action:test_v0.4.9'
+  image: 'docker://ghcr.io/tu6ge/publish-action:test_v0.4.10'
