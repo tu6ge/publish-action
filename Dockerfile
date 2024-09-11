@@ -1,4 +1,4 @@
-FROM rust:1.76.0-alpine3.19
+FROM rust:1.80.0-alpine3.20
 
 LABEL com.github.actions.name="auto publish"
 LABEL com.github.actions.icon="package"
@@ -10,7 +10,7 @@ LABEL homepage="http://github.com/tu6ge/publish-action"
 LABEL maintainer="tu6ge <772364230@qq.com>"
 
 RUN apk update
-RUN apk add openssl-dev git libc-dev
+RUN apk add git libc-dev libressl-dev
 
 WORKDIR /publish
 
