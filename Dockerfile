@@ -13,6 +13,7 @@ RUN apk update
 RUN apk add git libc-dev libressl-dev ca-certificates curl
 
 RUN update-ca-certificates
+RUN cp /etc/ssl/certs/ca-certificates.crt /etc/ssl/cert.pem
 
 WORKDIR /publish
 
