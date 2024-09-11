@@ -11,5 +11,5 @@ inputs:
     default: ""
 
 runs:
-  using: 'node20'
-  main: 'dist/index.js'
+  using: 'docker'
+  image: 'ghcr.io/tu6ge/publish-action:test_v0.4.1'
