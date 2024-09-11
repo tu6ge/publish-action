@@ -18,4 +18,4 @@ COPY . /publish
 
 RUN cargo build --release
 
-ENTRYPOINT ["/publish/target/publish/publish-action"]
+ENTRYPOINT ["/publish/target/release/publish-action"]
