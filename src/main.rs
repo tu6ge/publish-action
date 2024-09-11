@@ -1,11 +1,6 @@
 //extern crate openssl;
 
-use std::collections::HashSet;
 use std::env;
-use std::fs::read_to_string;
-
-use clap::Parser;
-use serde::{Deserialize, Serialize};
 
 use crate::error::Presult;
 
@@ -29,67 +24,6 @@ fn main() -> Presult<()> {
     publish(Some(dir), Some(tag_prefix))?;
 
     Ok(())
-}
-
-#[derive(Parser)]
-#[command(version, about, long_about = None)]
-struct Cli {
-    #[arg(short, long)]
-    dir: Option<String>,
-
-    #[arg(short, long)]
-    tag_prefix: Option<String>,
-
-    #[arg(short, long)]
-    config: Option<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct Project {
-    name: String,
-    dir: Option<String>,
-    tag_prefix: Option<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct ProjectList {
-    projects: Vec<Project>,
-}
-
-impl ProjectList {
-    fn check_same_error(&self) -> bool {
-        let mut dirs = HashSet::new();
-        let mut prefixes = HashSet::new();
-        let mut default_dir_total = 0_u8;
-        let mut default_prefix_total = 0_u8;
-        for it in self.projects.iter() {
-            if let Some(path) = it.dir.clone() {
-                dirs.insert(path);
-            } else {
-                default_dir_total += 1;
-            }
-            if let Some(p) = it.tag_prefix.clone() {
-                prefixes.insert(p);
-            } else {
-                default_prefix_total += 1;
-            }
-        }
-
-        if default_dir_total > 1 {
-            return false;
-        }
-        if default_prefix_total > 1 {
-            return false;
-        }
-        if dirs.len() + (default_dir_total as usize) < self.projects.len() {
-            return false;
-        }
-        if prefixes.len() + (default_prefix_total as usize) < self.projects.len() {
-            return false;
-        }
-
-        true
-    }
 }
 
 fn set_output(info: &'static str) {
