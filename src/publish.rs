@@ -109,12 +109,14 @@ fn get_publication_status(
     let _lock = config.acquire_package_cache_lock()?;
     // now - for each publication target, check whether it has this version (or newer)
     let mut statuses = Vec::with_capacity(publish_registries.len());
+    println!("aaa");
     for registry in publish_registries {
         let source_id = if registry == CRATES_IO_REGISTRY {
             SourceId::crates_io(&config)?
         } else {
             SourceId::alt_registry(&config, &registry)?
         };
+        println!("bbb");
         let mut package_registry = cargo::core::registry::PackageRegistry::new(&config)?;
         package_registry.lock_patches();
         let dep = Dependency::parse(
@@ -122,12 +124,14 @@ fn get_publication_status(
             Some(&package.version().to_string()),
             source_id,
         )?;
+        println!("ccc");
         let summaries = loop {
             match package_registry.query_vec(&dep, QueryKind::Exact)? {
                 Poll::Ready(deps) => break deps,
                 Poll::Pending => package_registry.block_until_ready()?,
             }
         };
+        println!("ddd");
         let matched = summaries
             .iter()
             .filter(|s| s.version() == package.version())
