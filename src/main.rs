@@ -18,8 +18,8 @@ fn main() -> Presult<()> {
     #[cfg(test)]
     dotenv().ok();
 
-    let dir = env::var("DIR")?;
-    let tag_prefix = env::var("TAG_PREFIX")?;
+    let dir = env::var("INPUT_DIR")?;
+    let tag_prefix = env::var("INPUT_TAG_PREFIX")?;
 
     publish(Some(dir), Some(tag_prefix))?;
 
