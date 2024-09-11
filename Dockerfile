@@ -12,6 +12,8 @@ LABEL maintainer="tu6ge <772364230@qq.com>"
 RUN apk update
 RUN apk add git libc-dev libressl-dev ca-certificates
 
+RUN update-ca-certificates
+
 WORKDIR /publish
 
 COPY . /publish
