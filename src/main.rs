@@ -24,7 +24,6 @@ fn main() -> Presult<()> {
     dotenv().ok();
 
     let dir = env::var("DIR")?;
-    ;
     let tag_prefix = env::var("TAG_PREFIX")?;
 
     publish(Some(dir), Some(tag_prefix))?;
