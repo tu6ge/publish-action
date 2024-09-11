@@ -19,6 +19,8 @@ WORKDIR /publish
 
 COPY . /publish
 
+COPY Amazon_Root_CA_1.pem /etc/ssl/certs/Amazon_Root_CA_1.pem
+
 RUN cargo build --release
 
 ENTRYPOINT ["/publish/target/release/publish-action"]
