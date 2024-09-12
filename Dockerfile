@@ -1,4 +1,4 @@
-FROM rust:1.80.0-alpine3.20
+FROM ubuntu:22.04
 
 LABEL com.github.actions.name="auto publish"
 LABEL com.github.actions.icon="package"
@@ -9,19 +9,20 @@ LABEL repository="http://github.com/tu6ge/publish-action"
 LABEL homepage="http://github.com/tu6ge/publish-action"
 LABEL maintainer="tu6ge <772364230@qq.com>"
 
-RUN apk update
-RUN apk add --no-cache git libc-dev openssl-dev curl build-base
-#RUN apk add git libc-dev libressl-dev ca-certificates curl
+RUN apt update
+RUN apt install -y curl build-essential pkg-config libssl-dev \
+&& apt-get clean \
+&& rm -rf /var/lib/apt/lists/*
 
-#RUN cp /etc/ssl/certs/ca-certificates.crt /etc/ssl/cert.pem
-#COPY Amazon_Root_CA_1.pem /etc/ssl/certs/Amazon_Root_CA_1.pem
-#RUN update-ca-certificates
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+
+# 设置环境变量
+ENV PATH="/root/.cargo/bin:${PATH}"
 
 WORKDIR /publish
 
 COPY . /publish
 
-RUN export RUSTFLAGS='-C target-feature=-crt-static'
-RUN cargo build
+RUN cargo build --release
 
-ENTRYPOINT ["/publish/target/debug/publish-action"]
+ENTRYPOINT ["/publish/target/release/publish-action"]
