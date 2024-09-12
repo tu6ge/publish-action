@@ -18,6 +18,7 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --de
 
 # 设置环境变量
 ENV PATH="/root/.cargo/bin:${PATH}"
+RUN rustup default stable
 
 WORKDIR /publish
 
