@@ -16,12 +16,11 @@ RUN apk add git libc-dev openssl-dev curl build-base
 #COPY Amazon_Root_CA_1.pem /etc/ssl/certs/Amazon_Root_CA_1.pem
 #RUN update-ca-certificates
 
-RUN export RUSTFLAGS='-C target-feature=-crt-static'
-
 WORKDIR /publish
 
 COPY . /publish
 
+RUN export RUSTFLAGS='-C target-feature=-crt-static'
 RUN cargo build --release
 
 ENTRYPOINT ["/publish/target/release/publish-action"]
