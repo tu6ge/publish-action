@@ -51,27 +51,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@master
-
-      # Use caching to speed up your build
-      - name: Cache publish-action bin
-        id: cache-publish-action
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-publish-action
-        with:
-          path: ~/.cargo
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-v0.2.0
-
-      # install publish-action by cargo in github action
-      - name: Install publish-action
-        if: steps.cache-publish-action.outputs.cache-hit != 'true'
-        run:
-          cargo install publish-action --version=0.2.0
       
       - name: Run publish-action
-        id: publish-action
-        run:
-          publish-action
+        uses: tu6ge/publish-action@0.4.1
         env:
           # This can help you tagging the github repository
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -119,27 +101,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@master
-
-      # Use caching to speed up your build
-      - name: Cache publish-action bin
-        id: cache-publish-action
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-publish-action
-        with:
-          path: ~/.cargo
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-v0.2.0
-
-      # install publish-action by cargo in github action
-      - name: Install publish-action
-        if: steps.cache-publish-action.outputs.cache-hit != 'true'
-        run:
-          cargo install publish-action --version=0.2.0
       
       - name: Run publish-action
-        id: publish-action
-        run:
-          publish-action
+        uses: tu6ge/publish-action@0.4.1
         env:
           # This can help you tagging the github repository
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
