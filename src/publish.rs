@@ -59,7 +59,7 @@ pub(crate) fn publish(path: Option<String>, tag_prefix: Option<String>) -> Presu
         .success();
 
     let com_res = Command::new("rustup")
-        .args(["run","stable","cargo","publish"])
+        .args(["run", "stable", "cargo", "publish"])
         .current_dir(&gh_path)
         .status()?;
     if !com_res.success() {
