@@ -14,7 +14,7 @@ RUN apt install -y curl build-essential pkg-config libssl-dev \
 && apt-get clean \
 && rm -rf /var/lib/apt/lists/*
 
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
 
 # 设置环境变量
 ENV PATH="/root/.cargo/bin:${PATH}"
