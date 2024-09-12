@@ -50,8 +50,8 @@ pub(crate) fn publish(path: Option<String>, tag_prefix: Option<String>) -> Presu
     set_output("new_version=true");
     println!("version not published");
 
-    let com_res = Command::new("cargo")
-        .arg("publish")
+    let com_res = Command::new("rustup")
+        .args(["run","stable","cargo","publish"])
         .current_dir(&gh_path)
         .status()?;
     if !com_res.success() {
