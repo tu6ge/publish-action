@@ -20,7 +20,7 @@ WORKDIR /publish
 
 COPY . /publish
 
-RUN export RUSTFLAGS='-C target-feature=+crt-static'
+# RUN export RUSTFLAGS='-C target-feature=-crt-static'
 RUN cargo build --release
 
 ENTRYPOINT ["/publish/target/release/publish-action"]
