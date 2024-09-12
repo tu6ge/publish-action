@@ -20,6 +20,8 @@ fn main() -> Presult<()> {
 
     let dir = env::var("INPUT_DIR")?;
     let tag_prefix = env::var("INPUT_TAG_PREFIX")?;
+    // let dir = "/".to_string();
+    // let tag_prefix = "".to_string();
 
     publish(Some(dir), Some(tag_prefix))?;
 
