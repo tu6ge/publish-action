@@ -1,4 +1,4 @@
-name: '@tu6ge/publish-action'
+name: 'publish-action'
 descripton: 'Auto publish cargo when git push new cargo.toml version, and tagging it by this version'
 inputs:
   DIR: 
@@ -12,4 +12,4 @@ inputs:
 
 runs:
   using: 'docker'
-  image: 'docker://ghcr.io/tu6ge/publish-action:v0.4.1'
+  image: 'docker://ghcr.io/tu6ge/publish-action:v0.4.2'
