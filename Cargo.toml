@@ -19,10 +19,7 @@ cargo = {version = "0.75.0", features = ["vendored-openssl"]}
 futures = "0.3.21"
 serde_json = "1.0.95"
 thiserror = "1.0"
-#openssl = "0.10.40"
 reqwest = { version = "0.11.10", features = ["blocking", "json"]}
-serde = "1.0"
-clap = { version = "4.5.4", features = ["derive"] }
 
 [dev-dependencies]
 dotenv = "0.15.0"
