@@ -51,6 +51,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@master
+        with:
+          # get git tags info
+          fetch-depth: 0
       
       - name: Run publish-action
         uses: tu6ge/publish-action@0.4.1
@@ -101,6 +104,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@master
+        with:
+          # get git tags info
+          fetch-depth: 0
       
       - name: Run publish-action
         uses: tu6ge/publish-action@0.4.1
