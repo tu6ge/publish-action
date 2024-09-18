@@ -49,6 +49,14 @@ pub(crate) fn publish(path: Option<String>, tag_prefix: Option<String>) -> Presu
     //println!("::set-output name=new_version::true");
     set_output("new_version=true");
     println!("version not published");
+    let _ = Command::new("rustup")
+        .args(["install", "stable"])
+        .status()?
+        .success();
+    let _ = Command::new("rustup")
+        .args(["default", "stable"])
+        .status()?
+        .success();
 
     let com_res = Command::new("rustup")
         .args(["run", "stable", "cargo", "publish"])
