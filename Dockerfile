@@ -10,7 +10,7 @@ LABEL homepage="http://github.com/tu6ge/publish-action"
 LABEL maintainer="tu6ge <772364230@qq.com>"
 
 RUN apk update
-RUN apk add build-base perl-dev
+RUN apk add build-base perl-dev pkgconfig openssl-dev
 #openssl-dev
 
 WORKDIR /publish
