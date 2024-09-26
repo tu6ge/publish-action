@@ -1,5 +1,5 @@
 name: 'publish-action'
-descripton: 'Auto publish cargo when git push new cargo.toml version, and tagging it by this version'
+description: 'Auto publish cargo when git push new version in cargo.toml , and tagging it by this version'
 inputs:
   DIR: 
     description: 'Crate package dirname'
