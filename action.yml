@@ -1,5 +1,8 @@
 name: 'publish-action'
 description: 'Auto publish cargo when git push new version in cargo.toml , and tagging it by this version'
+branding:
+  icon: 'arrow-up-circle'  # 图标的名称，不需要后缀
+  color: 'blue'  # 可以选择图标颜色
 inputs:
   DIR: 
     description: 'Crate package dirname'
