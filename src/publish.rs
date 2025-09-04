@@ -22,6 +22,7 @@ pub(crate) fn publish(path: Option<String>, tag_prefix: Option<String>) -> Presu
     let branch = env::var("GITHUB_REF_NAME")?;
     let token = env::var("GITHUB_TOKEN")?;
     let mut gh_path = env::var("GITHUB_WORKSPACE")?;
+    let ua_value = env::var("INPUT_USER_AGENT").ok();
     // let repository = String::from("aaa");
     // let branch = String::from("bbb");
     // let token = String::from("ccc");
@@ -68,7 +69,7 @@ pub(crate) fn publish(path: Option<String>, tag_prefix: Option<String>) -> Presu
         return Err(Perror::Input("publish command failed".to_string()));
     }
 
-    let gh = github::Github::new(&repository, &token);
+    let gh = github::Github::new(&repository, &token).set_ua(ua_value);
     let sha = gh.get_sha(&branch)?;
     println!("sha: {}", sha);
 

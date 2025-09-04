@@ -9,11 +9,21 @@ use serde_json::Value as JsonValue;
 pub struct Github<'a> {
     repositroy: &'a str,
     token: &'a str,
+    ua_value: Option<String>,
 }
 
 impl<'a> Github<'a> {
     pub fn new(repositroy: &'a str, token: &'a str) -> Github<'a> {
-        Github { repositroy, token }
+        Github {
+            repositroy,
+            token,
+            ua_value: None,
+        }
+    }
+
+    pub fn set_ua(mut self, value: Option<String>) -> Self {
+        self.ua_value = value;
+        self
     }
 
     /// # Build reqwest client with gihub common configure
@@ -38,7 +48,7 @@ impl<'a> Github<'a> {
         let mut request = client_inner
             .request(method, full_url)
             .header(AUTHORIZATION, format!("token {}", self.token))
-            .header(UA, UA_VALUE)
+            .header(UA, self.ua_value.clone().unwrap_or(UA_VALUE.to_string()))
             .header(ACCEPT, ACCEPT_VALUE);
 
         if let Some(body) = body {

@@ -62,6 +62,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # This can help you publish to crates.io
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        with:
+          # custom user agent of github api (optional)
+          USER_AGENT: "my user agent"
 ```
 
 5. You can push to github with new github action. this is finished.
