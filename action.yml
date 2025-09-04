@@ -15,4 +15,4 @@ inputs:
 
 runs:
   using: 'docker'
-  image: 'docker://ghcr.io/tu6ge/publish-action:v0.4.6'
+  image: 'docker://ghcr.io/tu6ge/publish-action:v0.4.7'
