@@ -1,4 +1,4 @@
-FROM rust:1.80.0-alpine3.20
+FROM rust:1.89-alpine3.20
 
 LABEL com.github.actions.name="auto publish to crates.io"
 LABEL com.github.actions.icon="package"
