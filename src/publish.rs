@@ -6,7 +6,9 @@ use crate::{
 };
 use cargo::{
     core::{Dependency, Registry, SourceId, Workspace},
-    sources::source::QueryKind,
+    sources::{source::QueryKind, SourceConfigMap},
+    util::cache_lock::CacheLockMode,
+    GlobalContext,
 };
 
 pub const CRATES_IO_REGISTRY: &str = "crates-io";
@@ -93,7 +95,7 @@ type Version = String;
 fn get_publication_status(
     workspace_root: &str,
 ) -> Presult<(Name, Version, Vec<PublicationStatus>)> {
-    let mut config = cargo::util::Config::default()?;
+    let mut config = GlobalContext::default()?;
     //println!("config init");
 
     config.configure(2, false, None, false, false, false, &None, &[], &[])?;
@@ -119,7 +121,7 @@ fn get_publication_status(
     if publish_registries.is_empty() {
         return Err(Perror::PublishingDisabled);
     }
-    let _lock = config.acquire_package_cache_lock()?;
+    let _lock = config.acquire_package_cache_lock(CacheLockMode::DownloadExclusive)?;
     // now - for each publication target, check whether it has this version (or newer)
     let mut statuses = Vec::with_capacity(publish_registries.len());
     for registry in publish_registries {
@@ -128,7 +130,10 @@ fn get_publication_status(
         } else {
             SourceId::alt_registry(&config, &registry)?
         };
-        let mut package_registry = cargo::core::registry::PackageRegistry::new(&config)?;
+        let mut package_registry = cargo::core::registry::PackageRegistry::new_with_source_config(
+            &config,
+            SourceConfigMap::new(&config)?,
+        )?;
         package_registry.lock_patches();
         let dep = Dependency::parse(
             package.name(),
@@ -143,7 +148,7 @@ fn get_publication_status(
         };
         let matched = summaries
             .iter()
-            .filter(|s| s.version() == package.version())
+            .filter(|s| s.as_summary().version() == package.version())
             .count()
             > 0;
         statuses.push(if matched {
