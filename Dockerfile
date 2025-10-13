@@ -17,7 +17,7 @@ COPY src ./src
 RUN cargo build --release
 
 # 运行阶段 - 使用更小的基础镜像
-FROM alpine:3.20
+FROM rust:1.89-alpine3.20
 
 LABEL com.github.actions.name="auto publish to crates.io"
 LABEL com.github.actions.icon="package"
