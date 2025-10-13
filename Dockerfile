@@ -6,7 +6,7 @@ RUN apk update && \
 WORKDIR /publish
 
 # 先拷贝依赖文件，利用 Docker 缓存层
-COPY Cargo.toml Cargo.lock ./
+COPY Cargo.toml ./
 RUN mkdir -p src && \
     echo "fn main() {}" > src/main.rs && \
     cargo build --release && \
