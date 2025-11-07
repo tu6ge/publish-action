@@ -56,7 +56,7 @@ jobs:
           fetch-depth: 0
       
       - name: Run publish-action
-        uses: tu6ge/publish-action@v0.4.7
+        uses: tu6ge/publish-action@v0.4.13
         env:
           # This can help you tagging the github repository
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -112,7 +112,7 @@ jobs:
           fetch-depth: 0
       
       - name: Run publish-action
-        uses: tu6ge/publish-action@v0.4.7
+        uses: tu6ge/publish-action@v0.4.13
         env:
           # This can help you tagging the github repository
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
