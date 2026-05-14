@@ -28,7 +28,7 @@ fn main() -> Presult<()> {
     Ok(())
 }
 
-fn set_output(info: &'static str) {
+fn set_output(info: &str) {
     use std::fs;
     use std::io::Write;
 
