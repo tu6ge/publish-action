@@ -85,6 +85,8 @@ pub(crate) fn publish(path: Option<String>, tag_prefix: Option<String>) -> Presu
     println!("new version tag {} is created", &tag);
     //println!("::set-output name=publish::true");
     set_output("publish=true");
+    let version_output = format!("new_version_value={}", version);
+    set_output(&version_output);
 
     Ok(())
 }
