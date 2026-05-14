@@ -1,5 +1,5 @@
-# 推送新 tag 时：先跑测试 / fmt / clippy，再用 git-cliff 生成变更说明，最后创建 GitHub Release。
-# 不修改已有 publish.yml；镜像构建仍由 release.yml 在 Release published 后触发。
+# 推送新 tag：fmt / clippy → build / test → changelog → 推送镜像 → 创建 GitHub Release。
+# 镜像先于 Release，避免「Release 已发布但镜像未推送」；fmt 最先便于尽快失败。
 
 name: Tag release
 
@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: write
+  packages: write
 
 env:
   REGISTRY: ghcr.io
@@ -35,16 +36,6 @@ jobs:
       - name: Rust cache
         uses: Swatinem/rust-cache@v2
 
-      - name: Build
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-
-      - name: Test
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-
       - name: Fmt
         uses: actions-rs/cargo@v1
         with:
@@ -57,6 +48,27 @@ jobs:
           command: clippy
           args: --all-features -- -D warnings
 
+      - name: Build
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+
+      - name: Test
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+
+      - name: Write git-cliff config (runtime only)
+        run: |
+          cat > cliff.toml <<'EOF'
+          [changelog]
+          trim = true
+
+          [git]
+          conventional_commits = true
+          filter_unconventional = false
+          EOF
+
       - name: Generate changelog
         uses: orhun/git-cliff-action@v4
         id: cliff
@@ -67,6 +79,31 @@ jobs:
           OUTPUT: CHANGES.md
           GITHUB_REPO: ${{ github.repository }}
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
       - name: Create GitHub Release
         id: release
         uses: softprops/action-gh-release@v2
@@ -76,23 +113,3 @@ jobs:
           body: ${{ steps.cliff.outputs.content }}
           draft: false
           prerelease: false
-
-      - name: Log in to the Container registry
-        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
-        with:
-          images: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-      - name: Build and push Docker image
-        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
