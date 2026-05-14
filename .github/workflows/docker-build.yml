@@ -1,0 +1,30 @@
+# 在分支 push / PR 上只做「能否成功构建镜像」的验证，不登录 registry、不上传。
+# 与 tag 发布时的真正 push 镜像区分开。
+
+name: Docker build (dry run)
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image (no push)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          tags: publish-action:ci
