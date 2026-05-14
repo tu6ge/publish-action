@@ -1,5 +1,5 @@
 # 在分支 push / PR 上只做「能否成功构建镜像」的验证，不登录 registry、不上传。
-# 与 tag 发布时的真正 push 镜像区分开。
+# 推 GHCR 见 docker-publish.yml（手动 Run workflow）；发 Release 见 tag-release.yml（推送 tag）。
 
 name: Docker build (dry run)
 
@@ -27,4 +27,5 @@ jobs:
         with:
           context: .
           push: false
+          load: true
           tags: publish-action:ci
