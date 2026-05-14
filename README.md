@@ -1,37 +1,61 @@
 # publish-action
 
-Auto Publish Cargo with Github Action
+Automatically publish a Rust crate to crates.io and create a matching Git tag when you push a new version in `Cargo.toml`.
 
-If you have a cargo repository, When you publish new version, The following steps are usually required:
+Publishing a crate usually involves:
 
-1. Update version in Cargo.toml
-2. Tagging the repository
-3. Publish to crates.io
-4. Push to github
+1. Bumping the version in `Cargo.toml`
+2. Creating a Git tag
+3. Running `cargo publish`
+4. Pushing to GitHub
 
-Sometimes, We forget to tagging the github repository. So I created the github action.
+It is easy to forget the Git tag. This action checks whether the version is already on the registry, publishes when needed, and creates the tag for you.
 
-Now, you only need update version in Cargo.toml, after you push to github, the github action can auto tagging the github repository,
-and publish to crates.io with new version.
+You still only change the version in `Cargo.toml` and push; the workflow can run tests first, then this action.
 
-Before you publish, you can also run test case.
-## Outputs (0.1.15 +)
+## Inputs
 
-After run the action, you can judge the state (find new version or not, publish success or failure) with outputs.
+| Input | Required | Default | Description |
+|-------|----------|---------|-------------|
+| `DIR` | No | `/` | Path to the crate directory, relative to the repository root (e.g. `/` for the root crate, `/project2/` for a sub-crate). |
+| `TAG_PREFIX` | No | *(empty)* | Prefix for the Git tag created after a successful publish. The full tag is `{TAG_PREFIX}{version}` (for example `v` + `1.2.3` → `v1.2.3`). |
+| `USER_AGENT` | No | *(none)* | Optional custom `User-Agent` string for GitHub API requests when creating the tag. |
 
-- `new_version`: return 'true' or 'false'
-- `publish`: return 'true' or 'false'
+Environment variables expected by the action:
+
+| Variable | Description |
+|----------|-------------|
+| `GITHUB_TOKEN` | Token with permission to create refs (tags). `secrets.GITHUB_TOKEN` is typical. |
+| `CARGO_REGISTRY_TOKEN` | crates.io API token used by `cargo publish`. |
+| `GITHUB_REPOSITORY`, `GITHUB_REF_NAME`, `GITHUB_WORKSPACE` | Set automatically in GitHub Actions. |
+
+## Outputs
+
+Use these in later steps as `${{ steps.<step-id>.outputs.<name> }}`.
+
+| Output | Values / presence | Meaning |
+|--------|-------------------|---------|
+| `new_version` | `true` or `false` | `false`: this `Cargo.toml` version is already on all configured publish registries (nothing to do). `true`: at least one registry does not have this version yet, so the action attempted `cargo publish`. |
+| `publish` | `true` or `false` | Set only when `new_version` was `true`. `true`: `cargo publish` succeeded and the Git tag was created. `false`: `cargo publish` failed. |
+| `new_version_value` | Semver string | Set only when `publish` is `true`. The version that was published (from `Cargo.toml`). |
+
+Typical combinations:
+
+- **Skip (already published):** `new_version=false`. `publish` and `new_version_value` are not written.
+- **Published in this run:** `new_version=true`, `publish=true`, `new_version_value` is the released version.
+- **Publish failed:** `new_version=true`, `publish=false`. `new_version_value` is not written; inspect logs and fix the crate or registry.
+
+> **Note:** Outputs named `new_version` and `publish` are available from **v0.1.15** onward. `new_version_value` is set on successful publish so workflows can use the exact version string without re-parsing `Cargo.toml`.
 
 ## Usage
 
-1. You should create a crates.io's token in https://crates.io/settings/tokens . and copy the token.
+1. Create a token at [crates.io tokens](https://crates.io/settings/tokens) and copy it.
 
-2. Open you repository settings page, find Environments Settings Page(https://github.com/xxx/xxx/settings/environments). Create a new environments width
-name is `cargo`, and add a environment secrets namd `CARGO_REGISTRY_TOKEN`, this value is step one's token.
+2. In the repository on GitHub, open **Settings → Environments** (`https://github.com/<owner>/<repo>/settings/environments`). Create an environment named `cargo` and add an environment secret `CARGO_REGISTRY_TOKEN` with the token from step 1.
 
-3. Open actions settings, select **Read and write permissions** option in *Workflow permissions*, and save it.
+3. Under **Settings → Actions → General → Workflow permissions**, enable **Read and write permissions** (needed to push tags), then save.
 
-4. open you local repository path, create a new github action setting file, example: `publish.yaml` in `.github/workflows` path. and write :
+4. Add a workflow file (for example `.github/workflows/publish.yaml`):
 
 ```yaml
 name: Publish to Cargo
@@ -46,38 +70,37 @@ jobs:
 
     name: 'publish'
 
-    # Reference your environment variables
     environment: cargo
 
     steps:
       - uses: actions/checkout@master
         with:
-          # get git tags info
           fetch-depth: 0
-      
+
       - name: Run publish-action
+        id: publish
         uses: tu6ge/publish-action@v0.4.13
         env:
-          # This can help you tagging the github repository
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # This can help you publish to crates.io
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         with:
-          # custom user agent of github api (optional)
-          USER_AGENT: "my user agent"
+          USER_AGENT: "my-user-agent"
+
+      - name: Example — only after a real publish
+        if: steps.publish.outputs.publish == 'true'
+        run: echo "Released ${{ steps.publish.outputs.new_version_value }}"
 ```
 
-5. You can push to github with new github action. this is finished.
+5. Push changes; on pushes that include a new unpublished version, the action will publish and tag.
 
-Now you change Cargo.toml, this can auto running.
+## Alternate registries (v0.2+)
 
-## Support custom registries `+0.2`
+If the crate uses an alternate registry, see the Cargo book: [Using an alternate registry](https://doc.rust-lang.org/cargo/reference/registries.html#using-an-alternate-registry).
 
-using an alternate registry , This is [Documentation](https://doc.rust-lang.org/cargo/reference/registries.html#using-an-alternate-registry)
+## Multiple crates in one repo (v0.3+)
 
-## Support multiple projects `+0.3`
+Use a matrix with `DIR` and `TAG_PREFIX`:
 
-This is an example:
 ```yaml
 name: Publish to Cargo
 
@@ -91,7 +114,6 @@ jobs:
 
     name: 'publish'
 
-    # Reference your environment variables
     environment: cargo
 
     strategy:
@@ -108,20 +130,16 @@ jobs:
     steps:
       - uses: actions/checkout@master
         with:
-          # get git tags info
           fetch-depth: 0
-      
+
       - name: Run publish-action
         uses: tu6ge/publish-action@v0.4.13
         env:
-          # This can help you tagging the github repository
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # This can help you publish to crates.io
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         with:
           DIR: ${{ matrix.dir }}
           TAG_PREFIX: ${{ matrix.tag_prefix }}
 ```
 
-if `DIR` is empty, this default is root dir, if `TAG_PREFIX` is empty, tag prefix is none, and finaly tag is only `x.x.x` .
-
+If `DIR` is empty, the default is the repository root. If `TAG_PREFIX` is empty, the tag is exactly the version string (for example `1.2.3`).
