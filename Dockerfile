@@ -1,4 +1,5 @@
-FROM rust:1.89-alpine3.20 as builder
+# `cargo` crate 的传递依赖需要较新的 rustc（见 Cargo 解析的 MSRV）；用 stable 避免与 1.89 等旧工具链冲突
+FROM rust:1.93-alpine AS builder
 
 RUN apk update && \
     apk add --no-cache build-base perl-dev pkgconfig openssl-dev
@@ -17,7 +18,7 @@ COPY src ./src
 RUN cargo build --release
 
 # 运行阶段 - 使用更小的基础镜像
-FROM rust:1.89-alpine3.20
+FROM rust:1.93-alpine
 
 LABEL com.github.actions.name="auto publish to crates.io"
 LABEL com.github.actions.icon="package"
