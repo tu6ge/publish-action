@@ -24,3 +24,4 @@
 - **`image_tag`（手动发布时填写的标签）、`action.yml` 里 `image:` 的镜像标签、以及最终推送的 git tag 三者应一致**，否则使用者 `uses: ...@v0.4.15` 拉到的 action 元数据与 GHCR 实际镜像会对不上。  
 - 向 GHCR 推送需要 workflow 具备 **`packages: write`**（`docker-publish.yml` 已声明）；若组织策略限制默认 `GITHUB_TOKEN`，需在仓库或组织设置中允许写入 Packages。  
 - 若先有 **git tag** 再补镜像，只要保证最终 **`action.yml` 与 GHCR 对齐** 即可；本流程刻意把「推镜像」放在手动按钮一步，便于控制发版节奏。
+- **成功通知**：工作流成功后会写入 **Job Summary**（在 Actions 本次运行页面顶部摘要区可见）。

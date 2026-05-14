@@ -1,5 +1,6 @@
 # 手动在 Actions 里「Run workflow」：跑质检后把镜像推到 GHCR，不创建 git tag、不发 GitHub Release。
 # 输入的 image_tag 须与之后在 action.yml 里写的版本、以及最终打 tag 发 Release 时用的标签一致（例如 v0.4.15）。
+# 成功后可写 Job Summary
 
 name: Publish Docker image to GHCR
 
@@ -87,3 +88,14 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Summary — Docker publish succeeded
+        run: |
+          {
+            echo "## Docker image published"
+            echo ""
+            echo "| Item | Value |"
+            echo "|------|-------|"
+            echo "| Image | \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ inputs.image_tag }}\` |"
+            echo "| Workflow | [open run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) |"
+          } >> "$GITHUB_STEP_SUMMARY"
