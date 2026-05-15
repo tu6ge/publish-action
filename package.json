@@ -11,7 +11,7 @@
     "vitest": "^3.0.0"
   },
   "scripts": {
-    "build": "tsc && ncc build dist/main.js -o dist/bundle",
+    "build": "tsc -p tsconfig.build.json && ncc build dist/main.js -o dist/bundle",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   }
