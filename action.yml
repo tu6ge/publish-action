@@ -27,4 +27,4 @@ outputs:
 
 runs:
   using: 'docker'
-  image: 'docker://ghcr.io/tu6ge/publish-action:v0.5.3'
+  image: 'docker://ghcr.io/tu6ge/publish-action:v0.5.4'
