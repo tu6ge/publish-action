@@ -1,7 +1,8 @@
 import * as core from "@actions/core";
 import { getCargoPackage } from "./cargo";
-import { getLatestPublishedVersion, isVersionPublished } from "./crates";
+import { getLatestPublishedVersion } from "./crates";
 import { cargoPublish, createTag } from "./publish";
+import { shouldPublishNewVersion } from "./version";
 
 async function run(): Promise<void> {
   const githubToken = process.env.GITHUB_TOKEN;
@@ -14,7 +15,7 @@ async function run(): Promise<void> {
   const { name, version } = await getCargoPackage();
   core.info(`Package: ${name}@${version}`);
 
-  core.info("Checking crates.io for published versions...");
+  core.info("Fetching latest version from crates.io...");
   const latestPublished = await getLatestPublishedVersion(name);
   core.info(
     latestPublished
@@ -22,17 +23,20 @@ async function run(): Promise<void> {
       : "Crate not found on crates.io (first publish)",
   );
 
-  const alreadyPublished = await isVersionPublished(name, version);
-  if (alreadyPublished) {
+  if (!shouldPublishNewVersion(version, latestPublished)) {
     core.info(
-      `Version ${version} is already published on crates.io; skipping publish.`,
+      `Local ${version} is not newer than crates.io (${latestPublished}); skipping publish.`,
     );
     core.setOutput("new_version", "false");
     core.setOutput("publish", "false");
     return;
   }
 
-  core.info(`Version ${version} is not on crates.io yet; publishing...`);
+  core.info(
+    latestPublished
+      ? `Local ${version} is newer than crates.io ${latestPublished}; publishing...`
+      : `Publishing first release ${version}...`,
+  );
   core.setOutput("new_version", "true");
 
   try {

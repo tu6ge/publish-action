@@ -38,26 +38,3 @@ export async function getLatestPublishedVersion(
   const data = (await res.json()) as { crate?: { max_version?: string } };
   return data.crate?.max_version ?? null;
 }
-
-/**
- * Whether `version` is already published for this crate on crates.io.
- */
-export async function isVersionPublished(
-  crateName: string,
-  version: string,
-): Promise<boolean> {
-  const res = await cratesFetch(
-    `${CRATES_IO}/crates/${encodeURIComponent(crateName)}/${encodeURIComponent(version)}`,
-  );
-
-  if (res.status === 404) {
-    return false;
-  }
-
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`crates.io ${res.status}: ${body.slice(0, 500)}`);
-  }
-
-  return true;
-}
