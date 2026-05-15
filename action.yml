@@ -1,0 +1,6 @@
+name: "tu6ge/publish-action"
+description: "Auto publish cargo package when you push a new version in Cargo.toml, and tag it with that version."
+
+runs:
+  using: node20
+  main: dist/bundle/index.js
