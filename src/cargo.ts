@@ -1,6 +1,8 @@
 import * as exec from "@actions/exec";
 
-export async function getCargoVersion(): Promise<string> {
+async function readCargoMetadata(): Promise<{
+  packages?: Array<{ name?: string; version?: string }>;
+}> {
   let output = "";
 
   await exec.exec("cargo", ["metadata", "--no-deps", "--format-version", "1"], {
@@ -12,13 +14,28 @@ export async function getCargoVersion(): Promise<string> {
     silent: true,
   });
 
-  const metadata = JSON.parse(output);
+  return JSON.parse(output);
+}
 
-  // metadata.packages[0] is the root package when --no-deps is used
-  const version: string | undefined = metadata?.packages?.[0]?.version;
-  if (!version) {
-    throw new Error("Could not read version from Cargo.toml");
+/**
+ * Name and version from `cargo metadata --no-deps` (`packages[0]`).
+ * Single-crate layout only; workspace is not handled.
+ */
+export async function getCargoPackage(): Promise<{
+  name: string;
+  version: string;
+}> {
+  const metadata = await readCargoMetadata();
+  const pkg = metadata.packages?.[0];
+
+  if (!pkg?.name || !pkg?.version) {
+    throw new Error("Could not read package name/version from Cargo.toml");
   }
 
+  return { name: pkg.name, version: pkg.version };
+}
+
+export async function getCargoVersion(): Promise<string> {
+  const { version } = await getCargoPackage();
   return version;
 }

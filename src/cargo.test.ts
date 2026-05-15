@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as exec from "@actions/exec";
-import { getCargoVersion } from "./cargo";
+import { getCargoPackage, getCargoVersion } from "./cargo";
 
 vi.mock("@actions/exec");
 
@@ -14,35 +14,49 @@ function mockCargoMetadata(payload: unknown): void {
   });
 }
 
-describe("getCargoVersion", () => {
+describe("getCargoPackage", () => {
   beforeEach(() => {
     vi.mocked(exec.exec).mockReset();
   });
 
-  it("returns version from cargo metadata packages[0]", async () => {
-    mockCargoMetadata({ packages: [{ version: "0.5.2" }] });
+  it("returns name and version from packages[0]", async () => {
+    mockCargoMetadata({
+      packages: [{ name: "publish-action", version: "0.5.2" }],
+    });
 
-    await expect(getCargoVersion()).resolves.toBe("0.5.2");
-    expect(exec.exec).toHaveBeenCalledWith(
-      "cargo",
-      ["metadata", "--no-deps", "--format-version", "1"],
-      expect.objectContaining({ silent: true }),
-    );
+    await expect(getCargoPackage()).resolves.toEqual({
+      name: "publish-action",
+      version: "0.5.2",
+    });
   });
 
   it("throws when packages[0] has no version", async () => {
     mockCargoMetadata({ packages: [{ name: "publish-action" }] });
 
-    await expect(getCargoVersion()).rejects.toThrow(
-      "Could not read version from Cargo.toml",
+    await expect(getCargoPackage()).rejects.toThrow(
+      "Could not read package name/version from Cargo.toml",
     );
   });
 
   it("throws when packages is empty", async () => {
     mockCargoMetadata({ packages: [] });
 
-    await expect(getCargoVersion()).rejects.toThrow(
-      "Could not read version from Cargo.toml",
+    await expect(getCargoPackage()).rejects.toThrow(
+      "Could not read package name/version from Cargo.toml",
     );
+  });
+});
+
+describe("getCargoVersion", () => {
+  beforeEach(() => {
+    vi.mocked(exec.exec).mockReset();
+  });
+
+  it("returns version from packages[0]", async () => {
+    mockCargoMetadata({
+      packages: [{ name: "publish-action", version: "0.5.2" }],
+    });
+
+    await expect(getCargoVersion()).resolves.toBe("0.5.2");
   });
 });
