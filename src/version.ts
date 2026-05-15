@@ -1,26 +1,26 @@
 import semver from "semver";
 
 /**
- * True when `current` should be published: crate not on crates.io yet, or
- * `current` is strictly newer than the latest version on crates.io.
+ * True when `current` should be published to a registry: not on that registry yet,
+ * or `current` is strictly newer than the latest version there.
  */
 export function shouldPublishNewVersion(
   current: string,
-  latestOnCratesIo: string | null,
+  latestOnRegistry: string | null,
 ): boolean {
   if (!semver.valid(current)) {
     throw new Error(`Invalid semver in Cargo.toml: ${current}`);
   }
 
-  if (latestOnCratesIo === null) {
+  if (latestOnRegistry === null) {
     return true;
   }
 
-  if (!semver.valid(latestOnCratesIo)) {
+  if (!semver.valid(latestOnRegistry)) {
     throw new Error(
-      `Invalid semver from crates.io max_version: ${latestOnCratesIo}`,
+      `Invalid semver from registry latest version: ${latestOnRegistry}`,
     );
   }
 
-  return semver.gt(current, latestOnCratesIo);
+  return semver.gt(current, latestOnRegistry);
 }

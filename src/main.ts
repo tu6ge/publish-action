@@ -1,6 +1,6 @@
 import * as core from "@actions/core";
 import { getCargoPackage } from "./cargo";
-import { getLatestPublishedVersion } from "./crates";
+import { getLatestPublishedVersion } from "./registry";
 import { cargoPublish, createTag } from "./publish";
 import { shouldPublishNewVersion } from "./version";
 
@@ -12,32 +12,44 @@ async function run(): Promise<void> {
   }
 
   core.info("Reading package from Cargo.toml (cargo metadata)...");
-  const { name, version } = await getCargoPackage();
+  const { name, version, publishRegistries } = await getCargoPackage();
   core.info(`Package: ${name}@${version}`);
+  core.info(`Publish registries: ${publishRegistries.join(", ")}`);
 
-  core.info("Fetching latest version from crates.io...");
-  const latestPublished = await getLatestPublishedVersion(name);
-  core.info(
-    latestPublished
-      ? `Latest on crates.io: ${latestPublished}`
-      : "Crate not found on crates.io (first publish)",
-  );
+  let needsPublish = false;
 
-  if (!shouldPublishNewVersion(version, latestPublished)) {
+  for (const registry of publishRegistries) {
+    core.info(`Checking latest version on registry "${registry}"...`);
+    const latest = await getLatestPublishedVersion(name, registry);
     core.info(
-      `Local ${version} is not newer than crates.io (${latestPublished}); skipping publish.`,
+      latest
+        ? `Latest on ${registry}: ${latest}`
+        : `Crate not found on ${registry} (first publish there)`,
     );
+
+    if (shouldPublishNewVersion(version, latest)) {
+      core.info(
+        latest
+          ? `Local ${version} is newer than ${registry} ${latest}`
+          : `Will publish ${version} to ${registry}`,
+      );
+      needsPublish = true;
+    } else {
+      core.info(
+        `Local ${version} is not newer than ${registry} (${latest}); no publish needed for this registry.`,
+      );
+    }
+  }
+
+  if (!needsPublish) {
+    core.info("No registry requires a new publish; skipping.");
     core.setOutput("new_version", "false");
     core.setOutput("publish", "false");
     return;
   }
 
-  core.info(
-    latestPublished
-      ? `Local ${version} is newer than crates.io ${latestPublished}; publishing...`
-      : `Publishing first release ${version}...`,
-  );
   core.setOutput("new_version", "true");
+  core.info(`Publishing to: ${publishRegistries.join(", ")}...`);
 
   try {
     await cargoPublish();
@@ -47,9 +59,12 @@ async function run(): Promise<void> {
     return;
   }
 
-  core.info(`Creating tag ${version}...`);
+  const tagPrefix = process.env.INPUT_TAG_PREFIX ?? "";
+  const tag = `${tagPrefix}${version}`;
+
+  core.info(`Creating tag ${tag}...`);
   try {
-    await createTag(version, githubToken);
+    await createTag(tag, githubToken);
   } catch (err) {
     core.setFailed(`Published successfully but failed to create tag: ${err}`);
     return;
@@ -57,7 +72,7 @@ async function run(): Promise<void> {
 
   core.setOutput("publish", "true");
   core.setOutput("new_version_value", version);
-  core.info(`Successfully published ${name} ${version} and created tag.`);
+  core.info(`Successfully published ${name} ${version} and created tag ${tag}.`);
 }
 
 run().catch((err) => {

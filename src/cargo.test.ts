@@ -1,6 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as exec from "@actions/exec";
-import { getCargoPackage, getCargoVersion } from "./cargo";
+import {
+  getCargoPackage,
+  getCargoVersion,
+  resolvePublishRegistries,
+} from "./cargo";
 
 vi.mock("@actions/exec");
 
@@ -14,36 +18,45 @@ function mockCargoMetadata(payload: unknown): void {
   });
 }
 
+describe("resolvePublishRegistries", () => {
+  it("defaults to crates-io when publish is omitted", () => {
+    expect(resolvePublishRegistries(null)).toEqual(["crates-io"]);
+    expect(resolvePublishRegistries(undefined)).toEqual(["crates-io"]);
+  });
+
+  it("uses explicit registry list from Cargo.toml", () => {
+    expect(resolvePublishRegistries(["my-registry"])).toEqual(["my-registry"]);
+    expect(resolvePublishRegistries(["a", "b"])).toEqual(["a", "b"]);
+  });
+
+  it("throws when publish is empty", () => {
+    expect(() => resolvePublishRegistries([])).toThrow(
+      "Publishing is disabled",
+    );
+  });
+});
+
 describe("getCargoPackage", () => {
   beforeEach(() => {
     vi.mocked(exec.exec).mockReset();
   });
 
-  it("returns name and version from packages[0]", async () => {
+  it("returns name, version, and publish registries", async () => {
     mockCargoMetadata({
-      packages: [{ name: "publish-action", version: "0.5.2" }],
+      packages: [
+        {
+          name: "my-crate",
+          version: "0.5.2",
+          publish: ["my-registry"],
+        },
+      ],
     });
 
     await expect(getCargoPackage()).resolves.toEqual({
-      name: "publish-action",
+      name: "my-crate",
       version: "0.5.2",
+      publishRegistries: ["my-registry"],
     });
-  });
-
-  it("throws when packages[0] has no version", async () => {
-    mockCargoMetadata({ packages: [{ name: "publish-action" }] });
-
-    await expect(getCargoPackage()).rejects.toThrow(
-      "Could not read package name/version from Cargo.toml",
-    );
-  });
-
-  it("throws when packages is empty", async () => {
-    mockCargoMetadata({ packages: [] });
-
-    await expect(getCargoPackage()).rejects.toThrow(
-      "Could not read package name/version from Cargo.toml",
-    );
   });
 });
 

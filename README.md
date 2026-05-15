@@ -93,9 +93,37 @@ jobs:
 
 5. Push changes; on pushes that include a new unpublished version, the action will publish and tag.
 
-## Alternate registries (v0.2+)
+## Alternate registries
 
-If the crate uses an alternate registry, see the Cargo book: [Using an alternate registry](https://doc.rust-lang.org/cargo/reference/registries.html#using-an-alternate-registry).
+Configure the registry in the repo’s `.cargo/config.toml` and restrict publishing in `Cargo.toml`, as in the [Cargo book — Using an alternate registry](https://doc.rust-lang.org/cargo/reference/registries.html#using-an-alternate-registry):
+
+```toml
+# .cargo/config.toml
+[registries]
+my-registry = { index = "sparse+https://example.com/index/" }
+
+# Cargo.toml
+[package]
+name = "my-project"
+version = "0.2.0"
+publish = ["my-registry"]
+```
+
+The action reads `package.publish` from `cargo metadata` (default is `crates-io` if omitted). For each listed registry it compares your local version with the latest on that registry; if any registry needs a newer release, it runs `cargo publish` (Cargo publishes to all registries allowed in `package.publish`).
+
+**Authentication in GitHub Actions**
+
+| Registry | Typical secret / env |
+|----------|----------------------|
+| crates.io | `CARGO_REGISTRY_TOKEN` |
+| `my-registry` | `CARGO_REGISTRIES_MY_REGISTRY_TOKEN` (name uppercased, `-` → `_`) |
+
+Run `cargo login --registry=my-registry` locally once to see the token format; in CI, set the matching `CARGO_REGISTRIES_*_TOKEN` secret. The runner must have the same `.cargo/config.toml` (committed or generated in a prior step) so `cargo` and `cargo info` can reach the index.
+
+**Version checks**
+
+- **crates.io** — crates.io API (`max_version`)
+- **Other registries** — `cargo info <name> --registry <registry> --format=json` (requires network access to the index/API configured for that registry)
 
 ## Multiple crates in one repo (v0.3+)
 
