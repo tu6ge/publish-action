@@ -7,10 +7,12 @@
   "devDependencies": {
     "@types/node": "^20",
     "@vercel/ncc": "^0.38.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.0.0"
   },
   "scripts": {
     "build": "tsc && ncc build dist/main.js -o dist/bundle",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   }
 }
