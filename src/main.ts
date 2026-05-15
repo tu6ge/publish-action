@@ -43,18 +43,19 @@ async function run(): Promise<void> {
     return;
   }
 
-  core.setOutput("new_version_value", currentVersion);
-
-  // Step 5: create git tag
+  // Step 5: create git tag — failure here fails the action,
+  // since downstream steps (e.g. create release) depend on the tag existing
   core.info(`Creating tag ${currentVersion}...`);
   try {
     await createTag(currentVersion, githubToken);
   } catch (err) {
-    // Publish succeeded — don't fail the action, just warn
-    core.warning(`Published successfully but failed to create tag: ${err}`);
+    core.setFailed(`Published successfully but failed to create tag: ${err}`);
+    return;
   }
 
+  // Only set these after both publish and tag succeeded
   core.setOutput("publish", "true");
+  core.setOutput("new_version_value", currentVersion);
   core.info(`Successfully published ${currentVersion} and created tag.`);
 }
 
