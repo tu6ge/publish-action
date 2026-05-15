@@ -4,3 +4,11 @@ description: "Auto publish cargo package when you push a new version in Cargo.to
 runs:
   using: node20
   main: dist/bundle/index.js
+
+outputs:
+  new_version:
+    description: 'Whether a new version was detected'
+  new_version_value:
+    description: 'The new version string, e.g. 1.2.3'
+  publish:
+    description: 'Whether the publish succeeded'
