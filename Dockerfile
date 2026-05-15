@@ -17,7 +17,7 @@ RUN mkdir -p src && \
 COPY src ./src
 RUN cargo build --release
 
-FROM debian:bookworm-slim
+FROM rust:1.93-slim-bookworm
 
 LABEL com.github.actions.name="auto publish to crates.io"
 LABEL com.github.actions.icon="package"
@@ -33,7 +33,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       libssl3 \
       curl \
       git \
-      # 用户项目的常见系统依赖
       build-essential \
       pkg-config \
       cmake \
@@ -46,14 +45,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       libx11-dev \
       libgl1-mesa-dev \
     && rm -rf /var/lib/apt/lists/*
-
-# 把 cargo/rustup 从 builder 带过来，让容器内可以执行 cargo publish
-COPY --from=builder /usr/local/cargo /usr/local/cargo
-COPY --from=builder /usr/local/rustup /usr/local/rustup
-
-ENV PATH="/usr/local/cargo/bin:$PATH"
-ENV RUSTUP_HOME="/usr/local/rustup"
-ENV CARGO_HOME="/usr/local/cargo"
 
 WORKDIR /app
 COPY --from=builder /publish/target/release/publish-action /app/
