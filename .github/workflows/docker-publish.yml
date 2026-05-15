@@ -29,6 +29,13 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Check tag not exists
+        run: |
+          if git ls-remote --tags origin | grep "refs/tags/${{ inputs.image_tag }}$"; then
+            echo "Tag ${{ inputs.image_tag }} already exists!"
+            exit 1
+          fi
+
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
