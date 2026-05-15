@@ -17,8 +17,7 @@ RUN mkdir -p src && \
 COPY src ./src
 RUN cargo build --release
 
-# 运行阶段 - 使用更小的基础镜像
-FROM rust:1.93-alpine
+FROM debian:bookworm-slim
 
 LABEL com.github.actions.name="auto publish to crates.io"
 LABEL com.github.actions.icon="package"
@@ -29,11 +28,34 @@ LABEL repository="http://github.com/tu6ge/publish-action"
 LABEL homepage="http://github.com/tu6ge/publish-action"
 LABEL maintainer="tu6ge <772364230@qq.com>"
 
-RUN apk add --no-cache libgcc openssl-dev
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      ca-certificates \
+      libssl3 \
+      curl \
+      git \
+      # 用户项目的常见系统依赖
+      build-essential \
+      pkg-config \
+      cmake \
+      libssl-dev \
+      libfontconfig1-dev \
+      libfreetype6-dev \
+      libasound2-dev \
+      libwayland-dev \
+      libxkbcommon-dev \
+      libx11-dev \
+      libgl1-mesa-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# 把 cargo/rustup 从 builder 带过来，让容器内可以执行 cargo publish
+COPY --from=builder /usr/local/cargo /usr/local/cargo
+COPY --from=builder /usr/local/rustup /usr/local/rustup
+
+ENV PATH="/usr/local/cargo/bin:$PATH"
+ENV RUSTUP_HOME="/usr/local/rustup"
+ENV CARGO_HOME="/usr/local/cargo"
 
 WORKDIR /app
-
-# 从构建阶段只拷贝二进制文件
 COPY --from=builder /publish/target/release/publish-action /app/
 
 ENTRYPOINT ["/app/publish-action"]
