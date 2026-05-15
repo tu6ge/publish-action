@@ -79,7 +79,7 @@ jobs:
 
       - name: Run publish-action
         id: publish
-        uses: tu6ge/publish-action@v0.5.3
+        uses: tu6ge/publish-action@v0.5.5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
@@ -133,7 +133,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run publish-action
-        uses: tu6ge/publish-action@v0.5.3
+        uses: tu6ge/publish-action@v0.5.5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
