@@ -59,7 +59,7 @@ async function run(): Promise<void> {
     return;
   }
 
-  const tagPrefix = process.env.INPUT_TAG_PREFIX ?? "";
+  const tagPrefix = core.getInput("TAG_PREFIX");
   const tag = `${tagPrefix}${version}`;
 
   core.info(`Creating tag ${tag}...`);
@@ -72,7 +72,9 @@ async function run(): Promise<void> {
 
   core.setOutput("publish", "true");
   core.setOutput("new_version_value", version);
-  core.info(`Successfully published ${name} ${version} and created tag ${tag}.`);
+  core.info(
+    `Successfully published ${name} ${version} and created tag ${tag}.`,
+  );
 }
 
 run().catch((err) => {

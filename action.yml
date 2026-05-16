@@ -1,6 +1,20 @@
 name: "tu6ge/publish-action"
 description: "Auto publish cargo package when you push a new version in Cargo.toml, and tag it with that version."
 
+inputs:
+  DIR:
+    description: "Path to the crate directory, relative to the repository root (e.g. / or /project2/)."
+    required: false
+    default: "/"
+  TAG_PREFIX:
+    description: "Prefix for the Git tag after a successful publish. Full tag is {TAG_PREFIX}{version} (e.g. v + 1.2.3 → v1.2.3)."
+    required: false
+    default: ""
+  USER_AGENT:
+    description: "Optional User-Agent for GitHub API and crates.io requests."
+    required: false
+    default: ""
+
 runs:
   using: node20
   main: dist/bundle/index.js
