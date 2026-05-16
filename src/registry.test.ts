@@ -2,6 +2,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import * as exec from "@actions/exec";
 import { getLatestPublishedVersion } from "./registry";
 
+vi.mock("@actions/core", () => ({
+  getInput: vi.fn(() => ""),
+}));
+
 vi.mock("@actions/exec");
 vi.mock("./crates", () => ({
   getLatestPublishedVersion: vi.fn(),

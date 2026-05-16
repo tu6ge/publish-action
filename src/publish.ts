@@ -1,19 +1,11 @@
 import * as exec from "@actions/exec";
 import * as github from "@actions/github";
 import * as core from "@actions/core";
-import { join } from "node:path";
-
-function crateRoot(): string {
-  const base = process.env.GITHUB_WORKSPACE ?? process.cwd();
-  let dir = process.env.INPUT_DIR ?? "/";
-  if (!dir.startsWith("/")) dir = `/${dir}`;
-  if (dir !== "/" && dir.endsWith("/")) dir = dir.slice(0, -1);
-  return dir === "/" ? base : join(base, dir);
-}
+import { getCrateRoot } from "./workspace";
 
 /** Publishes to every registry listed in `package.publish` (Cargo handles `--registry` internally). */
 export async function cargoPublish(): Promise<void> {
-  await exec.exec("cargo", ["publish"], { cwd: crateRoot() });
+  await exec.exec("cargo", ["publish"], { cwd: getCrateRoot() });
 }
 
 export async function createTag(version: string, token: string): Promise<void> {

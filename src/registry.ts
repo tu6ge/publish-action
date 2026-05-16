@@ -1,14 +1,6 @@
 import * as exec from "@actions/exec";
-import { join } from "node:path";
 import { getLatestPublishedVersion as getCratesIoLatest } from "./crates";
-
-function crateRoot(): string {
-  const base = process.env.GITHUB_WORKSPACE ?? process.cwd();
-  let dir = process.env.INPUT_DIR ?? "/";
-  if (!dir.startsWith("/")) dir = `/${dir}`;
-  if (dir !== "/" && dir.endsWith("/")) dir = dir.slice(0, -1);
-  return dir === "/" ? base : join(base, dir);
-}
+import { getCrateRoot } from "./workspace";
 
 const CRATES_IO = "crates-io";
 
@@ -40,7 +32,7 @@ async function getLatestViaCargoInfo(
     "cargo",
     ["info", crateName, "--registry", registry, "--format=json", "-q"],
     {
-      cwd: crateRoot(),
+      cwd: getCrateRoot(),
       listeners: {
         stdout: (data: Buffer) => {
           output += data.toString();

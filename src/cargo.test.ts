@@ -6,6 +6,10 @@ import {
   resolvePublishRegistries,
 } from "./cargo";
 
+vi.mock("@actions/core", () => ({
+  getInput: vi.fn(() => ""),
+}));
+
 vi.mock("@actions/exec");
 
 function mockCargoMetadata(payload: unknown): void {
