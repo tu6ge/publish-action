@@ -16,7 +16,11 @@ export async function cargoPublish(): Promise<void> {
 }
 
 export async function createTag(version: string, token: string): Promise<void> {
-  const octokit = github.getOctokit(token);
+  const customUa = process.env.INPUT_USER_AGENT;
+  const octokit = github.getOctokit(
+    token,
+    customUa ? { userAgent: customUa } : undefined,
+  );
   const { owner, repo } = github.context.repo;
   const sha = github.context.sha;
 
