@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { getLatestPublishedVersion } from "./crates";
+import { getLatestPublishedVersion } from "../src/crates";
 
 describe("getLatestPublishedVersion", () => {
   beforeEach(() => {

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import * as core from "@actions/core";
-import { getCrateRoot } from "./workspace";
+import { getCrateRoot } from "../src/workspace";
 
 vi.mock("@actions/core", () => ({
   getInput: vi.fn(),

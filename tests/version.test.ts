@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { shouldPublishNewVersion } from "./version";
+import { shouldPublishNewVersion } from "../src/version";
 
 describe("shouldPublishNewVersion", () => {
   it("returns true when crate is not on crates.io", () => {

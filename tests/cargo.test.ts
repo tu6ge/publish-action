@@ -4,7 +4,7 @@ import {
   getCargoPackage,
   getCargoVersion,
   resolvePublishRegistries,
-} from "./cargo";
+} from "../src/cargo";
 
 vi.mock("@actions/core", () => ({
   getInput: vi.fn(() => ""),

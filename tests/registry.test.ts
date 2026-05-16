@@ -1,17 +1,17 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import * as exec from "@actions/exec";
-import { getLatestPublishedVersion } from "./registry";
+import { getLatestPublishedVersion } from "../src/registry";
 
 vi.mock("@actions/core", () => ({
   getInput: vi.fn(() => ""),
 }));
 
 vi.mock("@actions/exec");
-vi.mock("./crates", () => ({
+vi.mock("../src/crates", () => ({
   getLatestPublishedVersion: vi.fn(),
 }));
 
-import { getLatestPublishedVersion as getCratesIoLatest } from "./crates";
+import { getLatestPublishedVersion as getCratesIoLatest } from "../src/crates";
 
 describe("getLatestPublishedVersion", () => {
   beforeEach(() => {
