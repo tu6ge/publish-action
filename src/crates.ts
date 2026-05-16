@@ -1,8 +1,9 @@
+import * as core from "@actions/core";
 const CRATES_IO = "https://crates.io/api/v1";
 
 function userAgent(): string {
   return (
-    process.env.INPUT_USER_AGENT ||
+    core.getInput("USER_AGENT") ||
     "publish-action (https://github.com/tu6ge/publish-action)"
   );
 }

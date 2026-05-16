@@ -1,5 +1,6 @@
 import * as exec from "@actions/exec";
 import * as github from "@actions/github";
+import * as core from "@actions/core";
 import { join } from "node:path";
 
 function crateRoot(): string {
@@ -16,7 +17,7 @@ export async function cargoPublish(): Promise<void> {
 }
 
 export async function createTag(version: string, token: string): Promise<void> {
-  const customUa = process.env.INPUT_USER_AGENT;
+  const customUa = core.getInput("USER_AGENT");
   const octokit = github.getOctokit(
     token,
     customUa ? { userAgent: customUa } : undefined,
