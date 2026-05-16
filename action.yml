@@ -7,8 +7,8 @@ runs:
 
 outputs:
   new_version:
-    description: 'Whether a new version was detected'
-  new_version_value:
-    description: 'The new version string, e.g. 1.2.3'
+    description: "Whether a new version was detected"
   publish:
-    description: 'Whether the publish succeeded'
+    description: "Whether the publish succeeded"
+  new_version_value:
+    description: "The new version string, e.g. 1.2.3"
