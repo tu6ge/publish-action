@@ -3,7 +3,7 @@
     "target": "ES2022",
     "module": "commonjs",
     "moduleResolution": "node",
-    "outDir": "dist",
+    "outDir": "dist/tsc-out",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
