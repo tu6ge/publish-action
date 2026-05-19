@@ -40,10 +40,12 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.resolvePackageFromMetadata = resolvePackageFromMetadata;
 exports.resolvePublishRegistries = resolvePublishRegistries;
 exports.getCargoPackage = getCargoPackage;
 exports.getCargoVersion = getCargoVersion;
 const exec = __importStar(__nccwpck_require__(2851));
+const node_path_1 = __nccwpck_require__(6760);
 const workspace_1 = __nccwpck_require__(1989);
 const CRATES_IO = "crates-io";
 async function readCargoMetadata() {
@@ -59,6 +61,28 @@ async function readCargoMetadata() {
     });
     return JSON.parse(output);
 }
+function manifestPathUnderCrateRoot(manifestPath, crateRoot) {
+    const root = (0, node_path_1.resolve)(crateRoot);
+    const manifest = (0, node_path_1.resolve)(manifestPath);
+    return manifest === root || manifest.startsWith(root + node_path_1.sep);
+}
+/**
+ * Same rule as:
+ * `jq -r --arg cwd "$PWD" '.packages[] | select(.manifest_path | startswith($cwd))'`
+ */
+function resolvePackageFromMetadata(metadata, crateRoot) {
+    const packages = metadata.packages ?? [];
+    const matches = packages.filter((p) => p.manifest_path && manifestPathUnderCrateRoot(p.manifest_path, crateRoot));
+    if (matches.length === 0) {
+        throw new Error(`No package with manifest_path under crate root: ${crateRoot}`);
+    }
+    const expectedManifest = (0, node_path_1.resolve)((0, node_path_1.join)(crateRoot, "Cargo.toml"));
+    const pkg = matches.find((p) => p.manifest_path && (0, node_path_1.resolve)(p.manifest_path) === expectedManifest) ?? matches[0];
+    if (!pkg.name || !pkg.version) {
+        throw new Error("Could not read package name/version from Cargo.toml");
+    }
+    return pkg;
+}
 /**
  * Registries this package may be published to (from `package.publish` in Cargo.toml).
  * @see https://doc.rust-lang.org/cargo/reference/registries.html#publishing-to-an-alternate-registry
@@ -73,14 +97,13 @@ function resolvePublishRegistries(publish) {
     return publish;
 }
 /**
- * Name, version, and publish registries from `cargo metadata --no-deps` (`packages[0]`).
+ * Name, version, and publish registries from `cargo metadata --no-deps`,
+ * selecting the package whose `manifest_path` is under the crate root (`DIR` / workspace).
  */
 async function getCargoPackage() {
+    const crateRoot = (0, workspace_1.getCrateRoot)();
     const metadata = await readCargoMetadata();
-    const pkg = metadata.packages?.[0];
-    if (!pkg?.name || !pkg?.version) {
-        throw new Error("Could not read package name/version from Cargo.toml");
-    }
+    const pkg = resolvePackageFromMetadata(metadata, crateRoot);
     return {
         name: pkg.name,
         version: pkg.version,
