@@ -2,3 +2,5 @@
 .env
 Cargo.lock
 /node_modules/
+dist/tsc-out/
+/pnpm-lock.yaml

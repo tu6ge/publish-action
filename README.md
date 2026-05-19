@@ -15,29 +15,29 @@ You still only change the version in `Cargo.toml` and push; the workflow can run
 
 ## Inputs
 
-| Input | Required | Default | Description |
-|-------|----------|---------|-------------|
-| `DIR` | No | `/` | Path to the crate directory, relative to the repository root (e.g. `/` for the root crate, `/project2/` for a sub-crate). |
-| `TAG_PREFIX` | No | *(empty)* | Prefix for the Git tag created after a successful publish. The full tag is `{TAG_PREFIX}{version}` (for example `v` + `1.2.3` → `v1.2.3`). |
-| `USER_AGENT` | No | *(none)* | Optional custom `User-Agent` string for GitHub API requests when creating the tag. |
+| Input        | Required | Default   | Description                                                                                                                                |
+| ------------ | -------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `DIR`        | No       | `/`       | Path to the crate directory, relative to the repository root (e.g. `/` for the root crate, `/project2/` for a sub-crate).                  |
+| `TAG_PREFIX` | No       | _(empty)_ | Prefix for the Git tag created after a successful publish. The full tag is `{TAG_PREFIX}{version}` (for example `v` + `1.2.3` → `v1.2.3`). |
+| `USER_AGENT` | No       | _(none)_  | Optional custom `User-Agent` string for GitHub API requests when creating the tag.                                                         |
 
 Environment variables expected by the action:
 
-| Variable | Description |
-|----------|-------------|
-| `GITHUB_TOKEN` | Token with permission to create refs (tags). `secrets.GITHUB_TOKEN` is typical. |
-| `CARGO_REGISTRY_TOKEN` | crates.io API token used by `cargo publish`. |
-| `GITHUB_REPOSITORY`, `GITHUB_REF_NAME`, `GITHUB_WORKSPACE` | Set automatically in GitHub Actions. |
+| Variable                                                   | Description                                                                     |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `GITHUB_TOKEN`                                             | Token with permission to create refs (tags). `secrets.GITHUB_TOKEN` is typical. |
+| `CARGO_REGISTRY_TOKEN`                                     | crates.io API token used by `cargo publish`.                                    |
+| `GITHUB_REPOSITORY`, `GITHUB_REF_NAME`, `GITHUB_WORKSPACE` | Set automatically in GitHub Actions.                                            |
 
 ## Outputs
 
 Use these in later steps as `${{ steps.<step-id>.outputs.<name> }}`.
 
-| Output | Values / presence | Meaning |
-|--------|-------------------|---------|
-| `new_version` | `true` or `false` | `false`: this `Cargo.toml` version is already on all configured publish registries (nothing to do). `true`: at least one registry does not have this version yet, so the action attempted `cargo publish`. |
-| `publish` | `true` or `false` | Set only when `new_version` was `true`. `true`: `cargo publish` succeeded and the Git tag was created. `false`: `cargo publish` failed. |
-| `new_version_value` | Semver string | Set only when `publish` is `true`. The version that was published (from `Cargo.toml`). |
+| Output              | Values / presence | Meaning                                                                                                                                                                                                    |
+| ------------------- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `new_version`       | `true` or `false` | `false`: this `Cargo.toml` version is already on all configured publish registries (nothing to do). `true`: at least one registry does not have this version yet, so the action attempted `cargo publish`. |
+| `publish`           | `true` or `false` | Set only when `new_version` was `true`. `true`: `cargo publish` succeeded and the Git tag was created. `false`: `cargo publish` failed.                                                                    |
+| `new_version_value` | Semver string     | Set only when `publish` is `true`. The version that was published (from `Cargo.toml`).                                                                                                                     |
 
 Typical combinations:
 
@@ -62,13 +62,13 @@ name: Publish to Cargo
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   publish:
     runs-on: ubuntu-latest
 
-    name: 'publish'
+    name: "publish"
 
     environment: cargo
 
@@ -93,9 +93,37 @@ jobs:
 
 5. Push changes; on pushes that include a new unpublished version, the action will publish and tag.
 
-## Alternate registries (v0.2+)
+## Alternate registries
 
-If the crate uses an alternate registry, see the Cargo book: [Using an alternate registry](https://doc.rust-lang.org/cargo/reference/registries.html#using-an-alternate-registry).
+Configure the registry in the repo’s `.cargo/config.toml` and restrict publishing in `Cargo.toml`, as in the [Cargo book — Using an alternate registry](https://doc.rust-lang.org/cargo/reference/registries.html#using-an-alternate-registry):
+
+```toml
+# .cargo/config.toml
+[registries]
+my-registry = { index = "sparse+https://example.com/index/" }
+
+# Cargo.toml
+[package]
+name = "my-project"
+version = "0.2.0"
+publish = ["my-registry"]
+```
+
+The action reads `package.publish` from `cargo metadata` (default is `crates-io` if omitted). For each listed registry it compares your local version with the latest on that registry; if any registry needs a newer release, it runs `cargo publish` (Cargo publishes to all registries allowed in `package.publish`).
+
+**Authentication in GitHub Actions**
+
+| Registry      | Typical secret / env                                              |
+| ------------- | ----------------------------------------------------------------- |
+| crates.io     | `CARGO_REGISTRY_TOKEN`                                            |
+| `my-registry` | `CARGO_REGISTRIES_MY_REGISTRY_TOKEN` (name uppercased, `-` → `_`) |
+
+Run `cargo login --registry=my-registry` locally once to see the token format; in CI, set the matching `CARGO_REGISTRIES_*_TOKEN` secret. The runner must have the same `.cargo/config.toml` (committed or generated in a prior step) so `cargo` and `cargo info` can reach the index.
+
+**Version checks**
+
+- **crates.io** — crates.io API (`max_version`)
+- **Other registries** — `cargo info <name> --registry <registry> --format=json` (requires network access to the index/API configured for that registry)
 
 ## Multiple crates in one repo (v0.3+)
 
@@ -106,13 +134,13 @@ name: Publish to Cargo
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   publish:
     runs-on: ubuntu-latest
 
-    name: 'publish'
+    name: "publish"
 
     environment: cargo
 
